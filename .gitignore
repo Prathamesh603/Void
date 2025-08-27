@@ -1,0 +1,45 @@
+".gitignore" 
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.pycache/
+*.egg-info/
+
+# Virtual Environment
+venv/
+env/
+ENV/
+.venv/
+
+# Jupyter / Notebook checkpoints
+.ipynb_checkpoints/
+
+# Data files
+data/raw/
+data/processed/
+data/embeddings/
+experiments/results/
+
+# Model / LLM weights
+*.ckpt
+*.pt
+*.bin
+*.model
+*.safetensors
+
+# Logs
+logs/
+*.log
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# VS Code
+.vscode/
+*.code-workspace
+
+# Secrets / API Keys
+config.yaml
