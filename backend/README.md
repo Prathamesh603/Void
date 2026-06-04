@@ -54,10 +54,19 @@ cp .env.example .env
 # Edit .env with your API keys
 ```
 
-### 3. Initialize Database
+### 3. Initialize Database (Supabase)
+
+Add `DATABASE_URL` to `backend/.env` (see `.env.example`), then:
 
 ```bash
+pip install psycopg2-binary
 python -c "from config.database import init_database; init_database()"
+```
+
+Optional — copy existing local SQLite data once:
+
+```bash
+python -m config.database
 ```
 
 ### 4. Run Backend

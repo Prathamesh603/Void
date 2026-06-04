@@ -198,10 +198,14 @@ async def chat_session(session_id: str, request: ChatRequest):
         # Build initial state
         messages = [HumanMessage(content=message_text)]
         
+        # Get user_id from session info
+        session_info = db.get_session(session_id)
+        user_id = session_info.get("user_id", "default_user") if session_info else "default_user"
+        
         state = AgentState(
             messages=messages,
             session_id=session_id,
-            user_id="default_user",
+            user_id=user_id,
             session_pdfs=papers,
             rag_context=[]
         )
@@ -211,13 +215,14 @@ async def chat_session(session_id: str, request: ChatRequest):
         
         # Extract response
         last_message = result["messages"][-1]
+        tool_used_message = result["messages"][-3]
         response_text = last_message.content if hasattr(last_message, "content") else str(last_message)
         
         # Get tools used
         tools_used = []
         tools_used_for_db = []
-        if hasattr(last_message, "tool_calls") and last_message.tool_calls:
-            for tool_call in last_message.tool_calls:
+        if hasattr(tool_used_message, "tool_calls") and tool_used_message.tool_calls:
+            for tool_call in tool_used_message.tool_calls:
                 tool_name = tool_call.get("name") if isinstance(tool_call, dict) else getattr(tool_call, "name", "unknown")
                 tools_used.append(ToolCall(
                     tool_name=tool_name,
@@ -285,10 +290,14 @@ async def chat_legacy(request: ChatRequest):
         # Build initial state
         messages = [HumanMessage(content=request.message)]
         
+        # Get user_id from session info
+        session_info = db.get_session(request.session_id)
+        user_id = session_info.get("user_id", "default_user") if session_info else "default_user"
+
         state = AgentState(
             messages=messages,
             session_id=request.session_id,
-            user_id="default_user",  # TODO: Get from auth
+            user_id=user_id,
             session_pdfs=papers,
             rag_context=[]
         )
@@ -504,7 +513,8 @@ async def view_pdf(pdf_id: str):
         return FileResponse(
             path=pdf_path,
             media_type="application/pdf",
-            filename=f"{pdf_id}.pdf"
+            filename=f"{pdf_id}.pdf",
+            content_disposition_type="inline"
         )
     
     except HTTPException:

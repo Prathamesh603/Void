@@ -1,8 +1,19 @@
 """
 Pydantic models for API requests/responses
 """
-from pydantic import BaseModel,EmailStr
+from datetime import date, datetime
 from typing import List, Optional
+
+from pydantic import BaseModel, EmailStr, field_validator
+
+
+def _datetime_to_str(value):
+    """PostgreSQL returns datetime objects; API responses use ISO strings."""
+    if value is None:
+        return value
+    if isinstance(value, (datetime, date)):
+        return value.isoformat()
+    return str(value)
 
 
 # =================== USER MODELS ===================
@@ -23,6 +34,11 @@ class UsersResponse(BaseModel):
     email: str
     created_at: str
 
+    @field_validator("created_at", mode="before")
+    @classmethod
+    def _coerce_created_at(cls, value):
+        return _datetime_to_str(value)
+
 # =================== SESSION MODELS ===================
 class CreateSessionRequest(BaseModel):
     """Request to create a new session"""
@@ -38,6 +54,11 @@ class SessionResponse(BaseModel):
     session_name: str
     created_at: str
     conversation_topic: Optional[str] = None
+
+    @field_validator("created_at", mode="before")
+    @classmethod
+    def _coerce_created_at(cls, value):
+        return _datetime_to_str(value)
 
 
 # =================== CHAT MODELS ===================
@@ -90,6 +111,11 @@ class PDFInfo(BaseModel):
     arxiv_id: str
     download_date: str
     file_size: Optional[int] = None
+
+    @field_validator("download_date", mode="before")
+    @classmethod
+    def _coerce_download_date(cls, value):
+        return _datetime_to_str(value)
 
 
 class PDFListResponse(BaseModel):

@@ -5,15 +5,17 @@ import os
 from pathlib import Path
 from dotenv import load_dotenv
 
-# Load environment variables from .env file
-load_dotenv()
-
 # Project root
 PROJECT_ROOT = Path(__file__).parent.parent.parent
 
 # Directories
 BACKEND_DIR = PROJECT_ROOT / "backend"
 DATA_DIR = BACKEND_DIR / "data"
+
+# Load environment variables from .env file
+load_dotenv(BACKEND_DIR / ".env")
+load_dotenv(PROJECT_ROOT / ".env")
+
 PDF_DIR = DATA_DIR / "pdfs"
 EMBEDDINGS_DIR = DATA_DIR / "embeddings"
 
@@ -21,8 +23,9 @@ EMBEDDINGS_DIR = DATA_DIR / "embeddings"
 PDF_DIR.mkdir(parents=True, exist_ok=True)
 EMBEDDINGS_DIR.mkdir(parents=True, exist_ok=True)
 
-# Database
-DATABASE_PATH = DATA_DIR / "research_agent.db"
+# Database (Supabase PostgreSQL)
+DATABASE_URL = os.getenv("DATABASE_URL")
+DATABASE_PATH = DATA_DIR / "research_agent.db"  # used only for optional SQLite migration
 
 # API Configuration
 API_HOST = os.getenv("API_HOST", "0.0.0.0")

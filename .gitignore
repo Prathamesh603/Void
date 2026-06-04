@@ -43,3 +43,5 @@ Thumbs.db
 
 # Secrets / API Keys
 config.yaml
+.env
+backend/.env

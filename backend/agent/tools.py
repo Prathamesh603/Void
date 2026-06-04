@@ -102,7 +102,7 @@ def arxiv_tool(query: str, max_results: int = 3, session_id: str = None):
     except Exception as e:
         return {
             "status": "error",
-            "message": f"ArXiv search failed: {str(e)}"
+            "message": f"ArXiv search failed: {str(e)} use other tool"
         }
 
 
@@ -218,6 +218,7 @@ def tavily_tool(query: str, max_results: int = 3, session_id: str = None):
 @tool
 def rag_tool(query: str, pdf_id: str = None, top_k: int = 5):
     """
+    dont use this 
     Retrieve relevant information from stored PDFs using RAG (Retrieval Augmented Generation).
     
     Use this when:

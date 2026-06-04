@@ -237,7 +237,7 @@ class DatabaseManager:
                 INSERT INTO pdf_files
                 (pdf_id, paper_id, session_id, file_path, file_size, vector_embedded, vector_store_id)
                 VALUES (?, ?, ?, ?, ?, ?, ?)
-            """, (pdf_id, paper_id, session_id, file_path, file_size, 1, vector_store_id))
+            """, (pdf_id, paper_id, session_id, file_path, file_size, True, vector_store_id))
             
             conn.commit()
         finally:
