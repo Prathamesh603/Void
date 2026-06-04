@@ -1,0 +1,131 @@
+"""
+Pydantic models for API requests/responses
+"""
+from pydantic import BaseModel,EmailStr
+from typing import List, Optional
+
+
+# =================== USER MODELS ===================
+class CreateUserRequest(BaseModel):
+    """Request to Create new user"""
+    user_id: str
+    email: EmailStr
+
+class UserResponse(BaseModel):
+    """User Information response"""
+    user_id: str
+    email: str
+    status: str
+
+class UsersResponse(BaseModel):
+    """User Information response"""
+    user_id: str
+    email: str
+    created_at: str
+
+# =================== SESSION MODELS ===================
+class CreateSessionRequest(BaseModel):
+    """Request to create a new session"""
+    user_id: str
+    session_name: str
+    topic: Optional[str] = None
+
+
+class SessionResponse(BaseModel):
+    """Session information response"""
+    session_id: str
+    user_id: str
+    session_name: str
+    created_at: str
+    conversation_topic: Optional[str] = None
+
+
+# =================== CHAT MODELS ===================
+
+class ChatRequest(BaseModel):
+    """Chat message request"""
+    session_id: str
+    message: str
+
+
+class ToolCall(BaseModel):
+    """Tool call information"""
+    tool_name: str
+    status: str
+
+
+class ChatResponse(BaseModel):
+    """Chat response"""
+    session_id: str
+    response: str
+    tools_used: Optional[List[ToolCall]] = None
+    timestamp: str
+
+
+# =================== PDF MODELS ===================
+
+class PaperInfo(BaseModel):
+    """Paper information from arxiv"""
+    arxiv_id: str
+    title: str
+    summary: str
+    pdf_url: str
+    authors: Optional[str] = None
+    published_date: Optional[str] = None
+
+
+class PDFDownloadRequest(BaseModel):
+    """Request to download and store PDF"""
+    session_id: str
+    paper_id: str
+    arxiv_id: str
+    pdf_url: str
+    title: str
+
+
+class PDFInfo(BaseModel):
+    """PDF information in session"""
+    pdf_id: str
+    title: str
+    arxiv_id: str
+    download_date: str
+    file_size: Optional[int] = None
+
+
+class PDFListResponse(BaseModel):
+    """List of PDFs in session"""
+    session_id: str
+    pdfs: List[PDFInfo]
+
+
+# =================== RAG MODELS ===================
+
+class RAGChunk(BaseModel):
+    """Retrieved chunk from RAG"""
+    content: str
+    source: str
+    page: str
+    relevance_score: str
+
+
+class RAGQueryRequest(BaseModel):
+    """RAG query request"""
+    session_id: str
+    query: str
+    pdf_id: Optional[str] = None
+
+
+class RAGQueryResponse(BaseModel):
+    """RAG query response"""
+    status: str
+    chunks_found: int
+    chunks: List[RAGChunk]
+
+
+# =================== ERROR MODELS ===================
+
+class ErrorResponse(BaseModel):
+    """Error response"""
+    error: str
+    message: str
+    status_code: int
