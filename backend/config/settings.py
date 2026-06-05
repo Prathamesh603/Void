@@ -33,7 +33,7 @@ API_PORT = int(os.getenv("API_PORT", 8000))
 API_RELOAD = os.getenv("API_RELOAD", "True").lower() == "true"
 
 # LLM Configuration
-LLM_MODEL = os.getenv("LLM_MODEL", "llama-3.3-70b-versatile")
+LLM_MODEL = os.getenv("LLM_MODEL", "openai/gpt-oss-120b")
 LLM_TEMPERATURE = float(os.getenv("LLM_TEMPERATURE", 0))
 LLM_PROVIDER = os.getenv("LLM_PROVIDER", "groq")  # groq, openai, etc
 

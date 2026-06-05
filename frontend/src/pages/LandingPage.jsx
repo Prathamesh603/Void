@@ -25,6 +25,7 @@ const fadeUp = {
 const features = [
   {
     icon: Search,
+    video: "/Void_clip1.mp4",
     title: 'Search academic sources',
     body: 'Ask Void to find papers on arXiv and the web. Results are saved to your session automatically.',
     tag: 'MULTI-SOURCE SEARCH',
@@ -32,6 +33,7 @@ const features = [
   },
   {
     icon: Zap,
+    video: "/Void_clip2.mp4",
     title: 'Instant research insights',
     body: 'Get summaries, comparisons, and answers grounded in the papers Void discovers for you.',
     tag: 'AI RESEARCH PARTNER',
@@ -39,6 +41,7 @@ const features = [
   },
   {
     icon: FileText,
+    video: "/Void_clip3.mp4",
     title: 'Papers at your fingertips',
     body: 'Every paper from your research lives in the sidebar. Open, index, and query PDFs with RAG.',
     tag: 'PDF + VECTOR INDEX',
@@ -46,6 +49,7 @@ const features = [
   },
   {
     icon: MessageSquare,
+    video: "/Void_clip4.mp4",
     title: 'Multi-session memory',
     body: 'Organize research into chats. Pick up any thread and continue where you left off.',
     tag: 'PERSISTENT SESSIONS',
@@ -67,6 +71,19 @@ export default function LandingPage() {
     localStorage.setItem('void_theme', theme);
   }, [theme]);
 
+  const headlines = [
+  { plain: 'Understand', grad: 'everything' },
+  { plain: 'An endless space', grad: 'for research.' },
+  { plain: 'Every question deserves', grad: 'a universe.' },
+  { plain: 'Explore the', grad: 'infinite void.' }
+];
+
+const [idx, setIdx] = useState(0);
+
+useEffect(() => {
+  const t = setInterval(() => setIdx(i => (i + 1) % headlines.length), 3000);
+  return () => clearInterval(t);
+}, []);
   return (
     <div className="min-h-screen bg-[#fafafa] dark:bg-void-950 text-neutral-900 dark:text-neutral-100 transition-colors duration-300">
       <header className="fixed top-0 z-50 w-full border-b border-neutral-200/80 dark:border-white/10 bg-[#fafafa]/80 dark:bg-[#0a0a0b]/80 backdrop-blur-3xl transition-colors duration-300">
@@ -122,13 +139,16 @@ export default function LandingPage() {
               Your research agent
             </motion.p>
             <motion.h1
-              variants={fadeUp}
-              custom={1}
-              className="font-display text-5xl leading-[1.1] tracking-tight md:text-7xl"
+            key={idx}
+            initial={{ opacity: 0, y: 16 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -16 }}
+            transition={{ duration: 1, ease: [0.22, 1, 0.36, 1] }}
+            className="font-display text-5xl leading-[1.1] tracking-tight md:text-7xl"
             >
-              Understand{' '}
-              <span className="void-gradient-text italic">everything</span>
-            </motion.h1>
+  {headlines[idx].plain}{' '}
+  <span className="void-gradient-text italic">{headlines[idx].grad}</span>
+</motion.h1>
             <motion.p
               variants={fadeUp}
               custom={2}
@@ -227,14 +247,30 @@ export default function LandingPage() {
                     <div className="mt-4 flex h-12 w-12 items-center justify-center rounded-xl bg-neutral-100 dark:bg-void-800">
                       <f.icon className="h-6 w-6 text-indigo-600 dark:text-indigo-400" />
                     </div>
-                    <h3 className="mt-4 text-2xl font-semibold">{f.title}</h3>
-                    <p className="mt-3 text-neutral-600 dark:text-neutral-400 leading-relaxed">{f.body}</p>
+                    <h3 className="mt-4 text-2xl font-display font-semibold tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-blue-400 via-purple-400 to-cyan-300">
+                    {f.title}</h3>
+                    <p className="mt-3 text-neutral-400/90 leading-relaxed text-[15px] font-light tracking-wide">
+                    {f.body}</p>
                   </div>
+                    <div className="w-full max-w-[520px] mx-auto">
                   <div
-                    className={`rounded-2xl border border-neutral-200 dark:border-white/10 bg-gradient-to-br ${f.color} p-8 min-h-[200px] flex items-center justify-center`}
-                  >
-                    <f.icon className="h-24 w-24 text-indigo-400/40" strokeWidth={1} />
-                  </div>
+                  className="aspect-video overflow-hidden rounded-2xl border border-white/10 bg-black"
+                  style={{
+                  boxShadow: "0 0 40px rgba(59,130,246,0.4), 0 0 50px rgba(168,85,247,0.3)"
+                  }}
+                  > 
+                <video
+                className="h-full w-full object-fill"
+                autoPlay
+                loop
+                muted
+                playsInline
+                >
+              <source src={f.video} type="video/mp4" />
+              </video>
+            </div>
+          </div>
+                  
                 </motion.article>
               ))}
             </div>

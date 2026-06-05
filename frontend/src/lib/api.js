@@ -145,7 +145,11 @@ export function pdfViewUrl(pdfId) {
 export function queryPdf(sessionId, query, pdfId = null) {
   return request('/pdf/query', {
     method: 'POST',
-    body: JSON.stringify({ session_id: sessionId, query, pdf_id: pdfId }),
+    body: JSON.stringify({
+      session_id: sessionId,
+      query: `Use the RAG retrieval tool and answer strictly from the uploaded PDF context.\n\nUser Query: ${query}`,
+      pdf_id: pdfId,
+    }),
   });
 }
 
