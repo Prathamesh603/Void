@@ -1,15 +1,22 @@
 import { API_BASE } from './constants';
 
-// Fetch PDF as blob for inline iframe display (avoids cross-origin download)
-export async function fetchPdfBlob(pdfId) {
-  const res = await fetch(`${API_BASE}/pdf/view/${pdfId}`);
-  if (!res.ok) throw new Error('Failed to load PDF');
-  const blob = await res.blob();
-  return URL.createObjectURL(blob);
+const TOKEN_KEY = 'void_token';
+const USER_KEY = 'void_user';
+
+export function getAuthToken() {
+  return localStorage.getItem(TOKEN_KEY);
+}
+
+export function setAuthToken(token) {
+  if (token) {
+    localStorage.setItem(TOKEN_KEY, token);
+  } else {
+    localStorage.removeItem(TOKEN_KEY);
+  }
 }
 
 export function getCurrentUser() {
-  const stored = localStorage.getItem('void_user');
+  const stored = localStorage.getItem(USER_KEY);
   if (stored) {
     try {
       return JSON.parse(stored);
@@ -22,15 +29,29 @@ export function getCurrentUser() {
 
 export function setCurrentUser(user) {
   if (user) {
-    localStorage.setItem('void_user', JSON.stringify(user));
+    localStorage.setItem(USER_KEY, JSON.stringify(user));
   } else {
-    localStorage.removeItem('void_user');
+    localStorage.removeItem(USER_KEY);
   }
+}
+
+export function clearAuth() {
+  setAuthToken(null);
+  setCurrentUser(null);
+}
+
+function authHeaders() {
+  const token = getAuthToken();
+  const headers = { 'Content-Type': 'application/json' };
+  if (token) {
+    headers.Authorization = `Bearer ${token}`;
+  }
+  return headers;
 }
 
 async function request(path, options = {}) {
   const res = await fetch(`${API_BASE}${path}`, {
-    headers: { 'Content-Type': 'application/json', ...options.headers },
+    headers: { ...authHeaders(), ...options.headers },
     ...options,
   });
   if (!res.ok) {
@@ -42,6 +63,9 @@ async function request(path, options = {}) {
     } catch {
       /* keep text */
     }
+    if (res.status === 401) {
+      clearAuth();
+    }
     throw new Error(typeof detail === 'string' ? detail : JSON.stringify(detail));
   }
   if (res.status === 204) return null;
@@ -50,28 +74,46 @@ async function request(path, options = {}) {
   return res;
 }
 
-export async function ensureUser() {
-  const user = getCurrentUser();
-  if (!user) return;
-  try {
-    await request(`/users/${user.user_id}`, {
-      method: 'POST',
-      body: JSON.stringify({ user_id: user.user_id, email: user.email }),
-    });
-  } catch {
-    /* user may already exist */
-  }
-}
-
-export async function createUser(userId, email) {
-  return request(`/users/${userId}`, {
+export async function register(email, password) {
+  const data = await request('/auth/register', {
     method: 'POST',
-    body: JSON.stringify({ user_id: userId, email }),
+    body: JSON.stringify({ email, password }),
   });
+  setAuthToken(data.access_token);
+  setCurrentUser({ user_id: data.user_id, email: data.email });
+  return data;
 }
 
-export async function listUsers() {
-  return request('/users');
+export async function login(email, password) {
+  const data = await request('/auth/login', {
+    method: 'POST',
+    body: JSON.stringify({ email, password }),
+  });
+  setAuthToken(data.access_token);
+  setCurrentUser({ user_id: data.user_id, email: data.email });
+  return data;
+}
+
+export async function fetchCurrentUser() {
+  const data = await request('/users/me');
+  setCurrentUser({ user_id: data.user_id, email: data.email });
+  return data;
+}
+
+export function logout() {
+  clearAuth();
+}
+
+export async function fetchPdfBlob(pdfId) {
+  const token = getAuthToken();
+  const headers = {};
+  if (token) {
+    headers.Authorization = `Bearer ${token}`;
+  }
+  const res = await fetch(`${API_BASE}/pdf/view/${pdfId}`, { headers });
+  if (!res.ok) throw new Error('Failed to load PDF');
+  const blob = await res.blob();
+  return URL.createObjectURL(blob);
 }
 
 export async function healthCheck() {
@@ -79,20 +121,13 @@ export async function healthCheck() {
 }
 
 export function listSessions() {
-  const user = getCurrentUser();
-  const uid = user ? user.user_id : 'void_user';
-  return request(`/sessions/${uid}`);
+  return request('/users/me/sessions');
 }
 
 export function createSession(sessionName) {
-  const user = getCurrentUser();
-  const uid = user ? user.user_id : 'void_user';
   return request('/sessions', {
     method: 'POST',
-    body: JSON.stringify({
-      user_id: uid,
-      session_name: sessionName,
-    }),
+    body: JSON.stringify({ session_name: sessionName }),
   });
 }
 

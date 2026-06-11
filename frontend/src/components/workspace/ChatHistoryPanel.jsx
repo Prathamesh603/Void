@@ -20,7 +20,7 @@ export default function ChatHistoryPanel({
   onNew,
   onDelete,
   currentUser,
-  onSwitchUser,
+  onLogout,
 }) {
   return (
     <div className="flex h-full flex-col bg-neutral-100 dark:bg-void-900 text-neutral-800 dark:text-neutral-200 border-r border-neutral-200 dark:border-white/10 transition-colors duration-300">
@@ -97,23 +97,20 @@ export default function ChatHistoryPanel({
           <div className="flex items-center justify-between rounded-xl border border-neutral-200 dark:border-white/5 bg-white dark:bg-void-900/50 p-2.5 shadow-sm">
             <div className="min-w-0 flex-1 flex items-center gap-2">
               <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 font-bold uppercase text-xs">
-                {currentUser.user_id ? currentUser.user_id[0] : 'U'}
+                {currentUser.email ? currentUser.email[0] : 'U'}
               </div>
               <div className="min-w-0">
                 <p className="truncate text-xs font-semibold text-neutral-800 dark:text-neutral-200">
-                  {currentUser.user_id}
-                </p>
-                <p className="truncate text-[9px] text-neutral-500 dark:text-neutral-450 leading-none mt-0.5">
                   {currentUser.email}
                 </p>
               </div>
             </div>
             <button
               type="button"
-              onClick={onSwitchUser}
+              onClick={onLogout}
               className="ml-2 shrink-0 rounded-lg border border-neutral-200 dark:border-white/10 bg-neutral-50 dark:bg-void-800 px-2 py-1 text-[10px] font-medium text-neutral-600 dark:text-neutral-300 hover:bg-neutral-100 dark:hover:bg-void-700 transition"
             >
-              Switch
+              Account
             </button>
           </div>
         </div>
