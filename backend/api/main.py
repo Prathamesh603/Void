@@ -1,6 +1,7 @@
 """
 FastAPI application setup
 """
+import asyncio
 import sys
 from pathlib import Path
 from contextlib import asynccontextmanager
@@ -15,16 +16,12 @@ from config.database import init_database
 from api.routes import router
 from utils.logger import logger
 
-# Initialize database
-init_database()
-
 # Lifespan context manager
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    # Startup
+    await asyncio.to_thread(init_database)
     logger.info("🚀 Research Agent API started")
     yield
-    # Shutdown
     logger.info("🛑 Research Agent API stopped")
 
 # Create FastAPI app with lifespan

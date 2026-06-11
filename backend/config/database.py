@@ -23,7 +23,8 @@ SCHEMA_STATEMENTS = [
     """
     CREATE TABLE IF NOT EXISTS users (
         user_id TEXT PRIMARY KEY,
-        email TEXT UNIQUE,
+        email TEXT UNIQUE NOT NULL,
+        password_hash TEXT,
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
     )
     """,
@@ -136,6 +137,9 @@ def init_database():
         cursor = conn.cursor()
         for statement in SCHEMA_STATEMENTS:
             cursor.execute(statement)
+        cursor.execute(
+            "ALTER TABLE users ADD COLUMN IF NOT EXISTS password_hash TEXT"
+        )
         conn.commit()
         print("✓ Database initialized on Supabase (PostgreSQL)")
     finally:

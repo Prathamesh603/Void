@@ -16,20 +16,29 @@ def _datetime_to_str(value):
     return str(value)
 
 
-# =================== USER MODELS ===================
-class CreateUserRequest(BaseModel):
-    """Request to Create new user"""
-    user_id: str
+# =================== AUTH MODELS ===================
+class RegisterRequest(BaseModel):
+    """Request to register a new account"""
     email: EmailStr
+    password: str
 
-class UserResponse(BaseModel):
-    """User Information response"""
+
+class LoginRequest(BaseModel):
+    """Request to log in"""
+    email: EmailStr
+    password: str
+
+
+class AuthResponse(BaseModel):
+    """Authentication response with JWT token"""
+    access_token: str
+    token_type: str = "bearer"
     user_id: str
     email: str
-    status: str
 
-class UsersResponse(BaseModel):
-    """User Information response"""
+
+class UserProfileResponse(BaseModel):
+    """Current user profile"""
     user_id: str
     email: str
     created_at: str
@@ -39,10 +48,10 @@ class UsersResponse(BaseModel):
     def _coerce_created_at(cls, value):
         return _datetime_to_str(value)
 
+
 # =================== SESSION MODELS ===================
 class CreateSessionRequest(BaseModel):
     """Request to create a new session"""
-    user_id: str
     session_name: str
     topic: Optional[str] = None
 

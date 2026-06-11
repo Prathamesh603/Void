@@ -47,8 +47,10 @@ EMBEDDINGS_MODEL = os.getenv("EMBEDDINGS_MODEL", "sentence-transformers/all-Mini
 EMBEDDINGS_PROVIDER = os.getenv("EMBEDDINGS_PROVIDER", "huggingface")  # huggingface, openai
 
 # Vector Store
-VECTOR_STORE_TYPE = os.getenv("VECTOR_STORE_TYPE", "chroma")  # chroma, pinecone, weaviate
+VECTOR_STORE_TYPE = os.getenv("VECTOR_STORE_TYPE", "chroma")  # chroma, pinecone, weaviate, qdrant
 VECTOR_STORE_PATH = EMBEDDINGS_DIR / "chroma_db"
+QDRANT_API_KEY = os.getenv("QDRANT_API_KEY")
+QDRANT_URL = os.getenv("QDRANT_URL")
 
 # PDF Processing
 PDF_CHUNK_SIZE = int(os.getenv("PDF_CHUNK_SIZE", 500))
@@ -59,3 +61,8 @@ LOG_LEVEL = os.getenv("LOG_LEVEL", "INFO")
 
 # Debug mode
 DEBUG = os.getenv("DEBUG", "False").lower() == "true"
+
+# Authentication
+JWT_SECRET = os.getenv("JWT_SECRET", "change-me-in-production-use-a-long-random-string")
+JWT_ALGORITHM = "HS256"
+JWT_EXPIRE_HOURS = int(os.getenv("JWT_EXPIRE_HOURS", 168))  # 7 days

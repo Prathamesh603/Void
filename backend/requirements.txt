@@ -21,4 +21,9 @@ tavily-python==0.7.22
 python-dotenv==1.1.1
 psycopg2-binary==2.9.10
 requests==2.32.5
+httpx==0.28.1
 email-validator
+qdrant-client==1.9.0
+PyJWT==2.10.1
+passlib[bcrypt]==1.7.4
+bcrypt==4.0.1
