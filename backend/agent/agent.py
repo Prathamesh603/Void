@@ -4,11 +4,13 @@ LangGraph agent compilation and execution
 import asyncio
 from langgraph.graph import StateGraph, START, END
 from langgraph.checkpoint.memory import MemorySaver
-from langchain_core.messages import ToolMessage
+from langchain_core.messages import SystemMessage, ToolMessage
 from agent.state import AgentState
 from agent.tools import tools
 from agent.nodes import chatbot_node, should_continue
-
+# from agent.state import state
+from langchain_core.messages import SystemMessage
+from config.settings import RESEARCH_SYSTEM_PROMPT
 
 def create_tool_node_with_session(tools_list):
     """
@@ -137,6 +139,15 @@ async def invoke_agent(state: AgentState, session_id: str):
         Result from graph invocation
     """
 
+    if not any(
+        isinstance(msg, SystemMessage)
+        for msg in state["messages"]
+    ):
+        state["messages"].insert(
+        0,
+        SystemMessage(content=RESEARCH_SYSTEM_PROMPT)
+        )
+    # Add session ID to state for debugging
     result = await agent.ainvoke(
         state,
         config={

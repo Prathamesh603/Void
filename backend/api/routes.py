@@ -240,10 +240,12 @@ async def chat_session(
         )
 
         result = await invoke_agent(state, session_id)
-
+        logger.info(f"get the result from the agent")
         last_message = result["messages"][-1]
-        tool_used_message = result["messages"][-3]
+        logger.info(f"get the last message from the agent")
+        tool_used_message = last_message
         response_text = last_message.content if hasattr(last_message, "content") else str(last_message)
+        logger.info(f"get the response text from the last message")
 
         tools_used = []
         tools_used_for_db = []
@@ -258,6 +260,7 @@ async def chat_session(
                     "tool_name": tool_name,
                     "status": "executed",
                 })
+        logger.info(f"tools used in this message {tools_used}")
 
         await db.save_message(
             session_id=session_id,
@@ -274,11 +277,8 @@ async def chat_session(
             tools_used=tools_used if tools_used else None,
             timestamp=datetime.now().isoformat(),
         )
-
-    except HTTPException:
-        raise
     except Exception as e:
-        logger.error(f"Error in chat: {str(e)}")
+        logger.exception(f"Error in chat: {e}")
         raise HTTPException(status_code=500, detail=str(e))
 
 
@@ -471,13 +471,14 @@ async def download_pdf(
     """Download and store PDF from arxiv (owner only)."""
     try:
         await get_owned_session(request.session_id, current_user["user_id"])
-
+        logger.info(f"Starting PDF download for session {request.session_id} and paper {request.paper_id}")
         chunks, metadatas = await process_pdf(
             pdf_url=request.pdf_url,
             pdf_id=request.paper_id,
             title=request.title,
         )
-
+        logger.info(f"PDF processed: {request.paper_id} with {len(chunks)} chunks")
+        logger.info(f"Starting vector store indexing for {request.paper_id}")
         await asyncio.gather(
             add_to_vector_store(request.paper_id, chunks, metadatas),
             db.save_pdf(

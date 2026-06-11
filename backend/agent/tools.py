@@ -103,7 +103,7 @@ async def arxiv_tool(query: str, max_results: int = 3, session_id: str = None):
         papers_raw = await asyncio.to_thread(
             _arxiv_search_sync, query, max_results, session_id
         )
-
+        
         if session_id and papers_raw:
             await _save_arxiv_papers(papers_raw, session_id)
 
