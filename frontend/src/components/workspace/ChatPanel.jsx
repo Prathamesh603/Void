@@ -12,6 +12,7 @@ const suggestions = [
 export default function ChatPanel({
   messages,
   loading,
+  switchingSession,
   isNewSession,
   onSend,
   sessionName,
@@ -25,7 +26,7 @@ export default function ChatPanel({
 
   const submit = (text) => {
     const msg = (text || input).trim();
-    if (!msg || loading) return;
+    if (!msg || loading || switchingSession) return;
     setInput('');
     onSend(msg);
   };
@@ -47,7 +48,33 @@ export default function ChatPanel({
 
       {/* Messages — flex-1 scrollable, no layout shift */}
       <div className="relative z-10 flex-1 overflow-y-auto px-4 py-6 md:px-8">
-        {messages.length === 0 && !loading ? (
+        {switchingSession ? (
+          <div className="mx-auto max-w-3xl space-y-4">
+            {/* Assistant Skeleton */}
+            <div className="flex justify-start">
+              <div className="w-[60%] rounded-2xl px-4 py-3 bg-white/60 dark:bg-white/[0.04] border border-neutral-200/70 dark:border-white/[0.07] animate-pulse space-y-2">
+                <div className="h-3 bg-neutral-300 dark:bg-neutral-700 rounded w-3/4"></div>
+                <div className="h-3 bg-neutral-300 dark:bg-neutral-700 rounded w-5/6"></div>
+                <div className="h-3 bg-neutral-300 dark:bg-neutral-700 rounded w-1/2"></div>
+              </div>
+            </div>
+
+            {/* User Skeleton */}
+            <div className="flex justify-end">
+              <div className="w-[40%] rounded-2xl px-4 py-3 bg-indigo-600/30 dark:bg-indigo-900/30 border border-indigo-500/20 animate-pulse">
+                <div className="h-3 bg-indigo-200/30 dark:bg-indigo-400/25 rounded w-2/3 ml-auto"></div>
+              </div>
+            </div>
+
+            {/* Assistant Skeleton */}
+            <div className="flex justify-start">
+              <div className="w-[70%] rounded-2xl px-4 py-3 bg-white/60 dark:bg-white/[0.04] border border-neutral-200/70 dark:border-white/[0.07] animate-pulse space-y-2">
+                <div className="h-3 bg-neutral-300 dark:bg-neutral-700 rounded w-5/6"></div>
+                <div className="h-3 bg-neutral-300 dark:bg-neutral-700 rounded w-2/3"></div>
+              </div>
+            </div>
+          </div>
+        ) : messages.length === 0 && !loading ? (
           <motion.div
             initial={{ opacity: 0, y: 12 }}
             animate={{ opacity: 1, y: 0 }}
@@ -66,7 +93,8 @@ export default function ChatPanel({
                   key={s}
                   type="button"
                   onClick={() => submit(s)}
-                  className="rounded-full border border-neutral-200 dark:border-white/10 bg-neutral-50 dark:bg-white/5 px-4 py-2 text-xs text-neutral-600 dark:text-neutral-400 hover:bg-neutral-100 hover:border-indigo-500/40 hover:text-neutral-900 dark:hover:text-neutral-200 transition font-sans"
+                  disabled={loading || switchingSession}
+                  className="rounded-full border border-neutral-200 dark:border-white/10 bg-neutral-50 dark:bg-white/5 px-4 py-2 text-xs text-neutral-600 dark:text-neutral-400 hover:bg-neutral-100 hover:border-indigo-500/40 hover:text-neutral-900 dark:hover:text-neutral-200 transition font-sans disabled:opacity-50"
                 >
                   {s}
                 </button>
@@ -150,13 +178,13 @@ export default function ChatPanel({
             value={input}
             onChange={(e) => setInput(e.target.value)}
             placeholder="Ask a research question…"
-            disabled={loading}
+            disabled={loading || switchingSession}
             className="flex-1 bg-transparent px-3 py-2 text-[15px] text-neutral-900 dark:text-neutral-100 placeholder:text-neutral-400 dark:placeholder:text-neutral-500 outline-none"
           />
 
           <button
             type="submit"
-            disabled={loading || !input.trim()}
+            disabled={loading || switchingSession || !input.trim()}
             className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl void-gradient-bg text-white transition-all disabled:opacity-40 hover:scale-105 active:scale-95 shadow-md shadow-indigo-500/20"
           >
             <ArrowUp className="h-4 w-4" />
