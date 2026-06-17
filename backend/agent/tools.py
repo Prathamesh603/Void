@@ -52,6 +52,13 @@ def _arxiv_search_sync(query: str, max_results: int, session_id: str = None):
 
 async def _save_arxiv_papers(papers_for_llm, session_id: str):
     for paper in papers_for_llm:
+        arxiv_id = paper["_arxiv_id"]
+        
+        # Check if paper is already saved in the current session
+        existing_papers = await db.get_papers(session_id)
+        if any(p.get("arxiv_id") == arxiv_id for p in existing_papers):
+            continue
+
         max_retries = 3
         retry_count = 0
         saved = False
@@ -60,7 +67,7 @@ async def _save_arxiv_papers(papers_for_llm, session_id: str):
             try:
                 await db.save_paper(
                     session_id=session_id,
-                    arxiv_id=paper["_arxiv_id"],
+                    arxiv_id=arxiv_id,
                     title=paper["title"],
                     summary=paper["_full_summary"],
                     pdf_url=paper["pdf_url"],
@@ -70,14 +77,15 @@ async def _save_arxiv_papers(papers_for_llm, session_id: str):
                 saved = True
             except Exception as db_error:
                 retry_count += 1
-                if "UNIQUE constraint" in str(db_error):
+                err_msg = str(db_error).lower()
+                if "unique" in err_msg or "duplicate key" in err_msg or "constraint" in err_msg:
                     break
                 if retry_count < max_retries:
                     wait_time = 0.5 * (2 ** retry_count)
                     await asyncio.sleep(wait_time)
                 else:
                     print(
-                        f"Warning: Could not save paper {paper['_arxiv_id']} "
+                        f"Warning: Could not save paper {arxiv_id} "
                         f"after {max_retries} retries: {str(db_error)}"
                     )
 

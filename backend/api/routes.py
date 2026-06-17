@@ -471,6 +471,44 @@ async def download_pdf(
     """Download and store PDF from arxiv (owner only)."""
     try:
         await get_owned_session(request.session_id, current_user["user_id"])
+        
+        # 1. Check if this PDF is already downloaded and indexed in the CURRENT session
+        existing_session_pdf = await db.get_pdf(request.paper_id)
+        if existing_session_pdf and existing_session_pdf.get("vector_embedded"):
+            return {
+                "status": "success",
+                "message": f"PDF '{request.title}' is already indexed in this session",
+                "pdf_id": request.paper_id,
+                "chunks": 0,
+            }
+
+        # 2. Check if this paper (arxiv_id) is already indexed GLOBALLY in any session
+        from core.vector_store import get_vector_store
+        store = get_vector_store()
+        
+        existing_global_pdf = await db.get_pdf_by_arxiv_id(request.arxiv_id)
+        if existing_global_pdf and existing_global_pdf.get("vector_store_id"):
+            vector_store_id = existing_global_pdf["vector_store_id"]
+            # Check if it actually exists in the vector store
+            exists_in_vector_store = await asyncio.to_thread(store.exists, vector_store_id)
+            if exists_in_vector_store:
+                logger.info(f"Reusing existing vector embeddings for paper {request.arxiv_id} (vector_store_id: {vector_store_id})")
+                await db.save_pdf(
+                    paper_id=request.paper_id,
+                    session_id=request.session_id,
+                    pdf_id=request.paper_id,
+                    file_path=f"data/pdfs/{request.paper_id}.pdf",
+                    file_size=0,
+                    vector_store_id=vector_store_id,
+                )
+                return {
+                    "status": "success",
+                    "message": f"PDF '{request.title}' embeddings reused and indexed",
+                    "pdf_id": request.paper_id,
+                    "chunks": 0,
+                }
+
+        # 3. If not already indexed, download and process
         logger.info(f"Starting PDF download for session {request.session_id} and paper {request.paper_id}")
         chunks, metadatas = await process_pdf(
             pdf_url=request.pdf_url,
@@ -491,11 +529,13 @@ async def download_pdf(
             ),
         )
 
-        logger.info(f"PDF stored: {request.paper_id}")
+        # Delete the downloaded PDF file immediately to save disk space
+        await delete_pdf(request.paper_id)
+        logger.info(f"PDF file deleted after processing: {request.paper_id}")
 
         return {
             "status": "success",
-            "message": f"PDF '{request.title}' downloaded and indexed",
+            "message": f"PDF '{request.title}' downloaded, indexed, and local file deleted",
             "pdf_id": request.paper_id,
             "chunks": len(chunks),
         }
@@ -549,10 +589,29 @@ async def delete_pdf_route(
     try:
         await get_owned_pdf(pdf_id, current_user["user_id"])
 
-        await asyncio.gather(
-            delete_pdf(pdf_id),
-            db.delete_pdf(pdf_id),
-        )
+        # Retrieve the PDF record to check its vector_store_id
+        pdf_info = await db.get_pdf(pdf_id)
+        if not pdf_info:
+            raise HTTPException(status_code=404, detail="PDF not found")
+
+        vector_store_id = pdf_info.get("vector_store_id")
+
+        # Delete the database record first
+        await db.delete_pdf(pdf_id)
+
+        # Reference counting: only delete from vector store if no other session uses it
+        if vector_store_id:
+            ref_count = await db.count_pdf_references(vector_store_id)
+            if ref_count == 0:
+                logger.info(f"No more references to vector_store_id: {vector_store_id}. Deleting vector chunks.")
+                from core.vector_store import get_vector_store
+                store = get_vector_store()
+                await asyncio.to_thread(store.delete_pdf, vector_store_id)
+            else:
+                logger.info(f"vector_store_id: {vector_store_id} still referenced by {ref_count} other sessions. Keeping vector chunks.")
+
+        # Try to delete any local PDF file just in case it exists
+        await delete_pdf(pdf_id)
 
         logger.info(f"PDF deleted: {pdf_id}")
 
@@ -570,20 +629,44 @@ async def view_pdf(
     pdf_id: str,
     current_user: dict = Depends(get_current_user),
 ):
-    """Retrieve PDF file for viewing (owner only)."""
+    """Retrieve PDF file for viewing (owner only or streamed on the fly)."""
     try:
         await get_owned_pdf(pdf_id, current_user["user_id"])
 
         pdf_path = PDF_DIR / f"{pdf_id}.pdf"
 
-        if not await asyncio.to_thread(os.path.exists, pdf_path):
-            raise HTTPException(status_code=404, detail="PDF file not found")
+        # 1. If local file exists, serve it
+        if await asyncio.to_thread(os.path.exists, pdf_path):
+            return FileResponse(
+                path=pdf_path,
+                media_type="application/pdf",
+                filename=f"{pdf_id}.pdf",
+                content_disposition_type="inline",
+            )
 
-        return FileResponse(
-            path=pdf_path,
+        # 2. If local file doesn't exist, stream on the fly from the remote pdf_url
+        pdf_url = await db.get_pdf_url(pdf_id)
+        if not pdf_url:
+            raise HTTPException(status_code=404, detail="PDF url not found in database")
+
+        logger.info(f"Streaming PDF on the fly from: {pdf_url}")
+
+        import httpx
+        from fastapi.responses import StreamingResponse
+
+        async def stream_pdf():
+            async with httpx.AsyncClient(timeout=30) as client:
+                async with client.stream("GET", pdf_url) as response:
+                    if response.status_code != 200:
+                        logger.error(f"Failed to fetch remote PDF: {response.status_code}")
+                        raise HTTPException(status_code=502, detail="Failed to fetch remote PDF")
+                    async for chunk in response.aiter_bytes():
+                        yield chunk
+
+        return StreamingResponse(
+            stream_pdf(),
             media_type="application/pdf",
-            filename=f"{pdf_id}.pdf",
-            content_disposition_type="inline",
+            headers={"Content-Disposition": f"inline; filename={pdf_id}.pdf"}
         )
 
     except HTTPException:

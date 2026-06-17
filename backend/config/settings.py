@@ -33,7 +33,7 @@ API_PORT = int(os.getenv("API_PORT", 8000))
 API_RELOAD = True
 
 # LLM Configuration
-LLM_MODEL = os.getenv("LLM_MODEL", "openai/gpt-oss-120b")
+LLM_MODEL = os.getenv("LLM_MODEL", "llama-3.3-70b-versatile")
 LLM_TEMPERATURE = float(os.getenv("LLM_TEMPERATURE", 0))
 LLM_PROVIDER = os.getenv("LLM_PROVIDER", "groq")  # groq, openai, etc
 
@@ -45,6 +45,10 @@ OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
 # Embeddings
 EMBEDDINGS_MODEL = os.getenv("EMBEDDINGS_MODEL", "sentence-transformers/all-MiniLM-L6-v2")
 EMBEDDINGS_PROVIDER = os.getenv("EMBEDDINGS_PROVIDER", "huggingface")  # huggingface, openai
+QDRANT_EMBEDDING_MODEL = os.getenv(
+    "QDRANT_EMBEDDING_MODEL",
+    "intfloat/multilingual-e5-small"
+)
 
 # Vector Store
 VECTOR_STORE_TYPE = os.getenv("VECTOR_STORE_TYPE", "chroma")  # chroma, pinecone, weaviate, qdrant

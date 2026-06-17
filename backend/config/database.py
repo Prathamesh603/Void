@@ -54,14 +54,15 @@ SCHEMA_STATEMENTS = [
     CREATE TABLE IF NOT EXISTS papers (
         paper_id TEXT PRIMARY KEY,
         session_id TEXT,
-        arxiv_id TEXT UNIQUE,
+        arxiv_id TEXT,
         title TEXT,
         summary TEXT,
         pdf_url TEXT,
         authors TEXT,
         published_date TEXT,
         stored_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-        FOREIGN KEY(session_id) REFERENCES sessions(session_id)
+        FOREIGN KEY(session_id) REFERENCES sessions(session_id),
+        UNIQUE (session_id, arxiv_id)
     )
     """,
     """
@@ -135,6 +136,50 @@ def init_database():
     conn = _connect()
     try:
         cursor = conn.cursor()
+        
+        # Remove unique constraint on arxiv_id to allow multiple sessions to store the same paper
+        try:
+            # Query pg_constraint for any unique constraint on papers table
+            cursor.execute("""
+                SELECT conname 
+                FROM pg_constraint 
+                WHERE conrelid = 'papers'::regclass AND contype = 'u'
+            """)
+            constraints = [row["conname"] for row in cursor.fetchall()]
+            for con in constraints:
+                if con != "papers_session_id_arxiv_id_key":
+                    print(f"Dropping constraint {con} from papers table")
+                    cursor.execute(f"ALTER TABLE papers DROP CONSTRAINT IF EXISTS {con} CASCADE")
+            conn.commit()
+        except Exception as e:
+            print(f"Note: Could not drop unique constraints: {e}")
+            conn.rollback()
+
+        # Drop any unique index on arxiv_id (except the composite one)
+        try:
+            cursor.execute("""
+                SELECT indexname 
+                FROM pg_indexes 
+                WHERE tablename = 'papers' AND indexdef LIKE '%UNIQUE%' AND indexdef LIKE '%arxiv_id%'
+            """)
+            indexes = [row["indexname"] for row in cursor.fetchall()]
+            for idx in indexes:
+                if idx != "papers_session_id_arxiv_id_key":
+                    print(f"Dropping unique index {idx} from papers table")
+                    cursor.execute(f"DROP INDEX IF EXISTS {idx} CASCADE")
+            conn.commit()
+        except Exception as e:
+            print(f"Note: Could not drop unique indexes: {e}")
+            conn.rollback()
+
+        # Add composite unique constraint (session_id, arxiv_id) to papers table
+        try:
+            cursor.execute("ALTER TABLE papers ADD CONSTRAINT papers_session_id_arxiv_id_key UNIQUE (session_id, arxiv_id)")
+            conn.commit()
+        except Exception as e:
+            # If it already exists, it will raise an error, which we safely ignore
+            conn.rollback()
+
         for statement in SCHEMA_STATEMENTS:
             cursor.execute(statement)
         cursor.execute(

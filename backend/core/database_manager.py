@@ -363,6 +363,83 @@ class DatabaseManager:
     async def delete_pdf(pdf_id: str):
         return await asyncio.to_thread(DatabaseManager._delete_pdf, pdf_id)
 
+    @staticmethod
+    def _get_paper_by_arxiv_id(arxiv_id: str) -> Optional[Dict]:
+        """Get paper details by arxiv_id"""
+        conn = get_db_connection()
+        try:
+            cursor = conn.cursor()
+            cursor.execute("""
+                SELECT * FROM papers WHERE arxiv_id = ?
+            """, (arxiv_id,))
+            row = cursor.fetchone()
+            return dict(row) if row else None
+        finally:
+            conn.close()
+
+    @staticmethod
+    async def get_paper_by_arxiv_id(arxiv_id: str) -> Optional[Dict]:
+        return await asyncio.to_thread(DatabaseManager._get_paper_by_arxiv_id, arxiv_id)
+
+    @staticmethod
+    def _get_pdf_by_arxiv_id(arxiv_id: str) -> Optional[Dict]:
+        """Get PDF metadata by arxiv_id (globally)"""
+        conn = get_db_connection()
+        try:
+            cursor = conn.cursor()
+            cursor.execute("""
+                SELECT pf.* FROM pdf_files pf
+                JOIN papers p ON pf.paper_id = p.paper_id
+                WHERE p.arxiv_id = ?
+                LIMIT 1
+            """, (arxiv_id,))
+            row = cursor.fetchone()
+            return dict(row) if row else None
+        finally:
+            conn.close()
+
+    @staticmethod
+    async def get_pdf_by_arxiv_id(arxiv_id: str) -> Optional[Dict]:
+        return await asyncio.to_thread(DatabaseManager._get_pdf_by_arxiv_id, arxiv_id)
+
+    @staticmethod
+    def _get_pdf_url(pdf_id: str) -> Optional[str]:
+        """Get paper's pdf_url by pdf_id"""
+        conn = get_db_connection()
+        try:
+            cursor = conn.cursor()
+            cursor.execute("""
+                SELECT p.pdf_url FROM pdf_files pf
+                JOIN papers p ON pf.paper_id = p.paper_id
+                WHERE pf.pdf_id = ?
+            """, (pdf_id,))
+            row = cursor.fetchone()
+            return row["pdf_url"] if row else None
+        finally:
+            conn.close()
+
+    @staticmethod
+    async def get_pdf_url(pdf_id: str) -> Optional[str]:
+        return await asyncio.to_thread(DatabaseManager._get_pdf_url, pdf_id)
+
+    @staticmethod
+    def _count_pdf_references(vector_store_id: str) -> int:
+        """Count how many PDF records use a given vector_store_id"""
+        conn = get_db_connection()
+        try:
+            cursor = conn.cursor()
+            cursor.execute("""
+                SELECT COUNT(*) as count FROM pdf_files WHERE vector_store_id = ?
+            """, (vector_store_id,))
+            row = cursor.fetchone()
+            return row["count"] if row else 0
+        finally:
+            conn.close()
+
+    @staticmethod
+    async def count_pdf_references(vector_store_id: str) -> int:
+        return await asyncio.to_thread(DatabaseManager._count_pdf_references, vector_store_id)
+
 
 # Convenience instance
 db = DatabaseManager()

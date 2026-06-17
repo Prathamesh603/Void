@@ -15,18 +15,25 @@ except ImportError:
 
 try:
     import qdrant_client
-    from qdrant_client.models import Distance, VectorParams, PointStruct, Filter, FieldCondition, MatchValue
+    from qdrant_client.models import (
+    Distance,
+    VectorParams,
+    PointStruct,
+    Filter,
+    FieldCondition,
+    MatchValue,
+    Document,
+    )
     QDRANT_AVAILABLE = True
 except ImportError:
     QDRANT_AVAILABLE = False
 
 from config.settings import (
     VECTOR_STORE_PATH,
-    EMBEDDINGS_MODEL,
-    PDF_CHUNK_SIZE,
     VECTOR_STORE_TYPE,
     QDRANT_API_KEY,
-    QDRANT_URL
+    QDRANT_URL,
+    QDRANT_EMBEDDING_MODEL
 )
 
 
@@ -36,7 +43,7 @@ class VectorStore:
     def __init__(self):
         """Initialize vector store"""
         self.store_type = VECTOR_STORE_TYPE.lower()
-        self._model = None
+        # self._model = None
         self.collection = None
 
         if self.store_type == "qdrant":
@@ -47,19 +54,20 @@ class VectorStore:
 
             self.client = qdrant_client.QdrantClient(
                 url=QDRANT_URL,
-                api_key=QDRANT_API_KEY
+                api_key=QDRANT_API_KEY,
+                cloud_inference=True
             )
         else:
             if not CHROMA_AVAILABLE:
                 raise ImportError("chromadb not installed. Install with: pip install chromadb")
             self.client = chromadb.PersistentClient(path=str(VECTOR_STORE_PATH))
 
-    def _get_embedding_model(self):
-        """Lazy load the embedding model to improve server startup time"""
-        if self._model is None:
-            from sentence_transformers import SentenceTransformer
-            self._model = SentenceTransformer(EMBEDDINGS_MODEL)
-        return self._model
+    # def _get_embedding_model(self):
+    #     """Lazy load the embedding model to improve server startup time"""
+    #     if self._model is None:
+    #         from sentence_transformers import SentenceTransformer
+    #         self._model = SentenceTransformer(EMBEDDINGS_MODEL)
+    #     return self._model
 
     def get_or_create_collection(self, name: str = "research_papers"):
         """Get or create a collection/index"""
@@ -69,11 +77,11 @@ class VectorStore:
 
             if name not in collection_names:
                 dimensions = 384
-                try:
-                    model = self._get_embedding_model()
-                    dimensions = model.get_sentence_embedding_dimension()
-                except Exception:
-                    pass
+                # try:
+                #     model = self._get_embedding_model()
+                #     dimensions = model.get_sentence_embedding_dimension()
+                # except Exception:
+                #     pass
 
                 self.client.create_collection(
                     collection_name=name,
@@ -112,9 +120,6 @@ class VectorStore:
             self.get_or_create_collection()
 
         if self.store_type == "qdrant":
-            model = self._get_embedding_model()
-            embeddings = model.encode(chunks).tolist()
-
             points = []
             for i, (chunk, metadata) in enumerate(zip(chunks, metadatas)):
                 payload = dict(metadata)
@@ -123,11 +128,16 @@ class VectorStore:
 
                 point_id = str(uuid.uuid5(uuid.NAMESPACE_DNS, f"{pdf_id}_chunk_{i}"))
 
-                points.append(PointStruct(
-                    id=point_id,
-                    vector=embeddings[i],
-                    payload=payload
-                ))
+                points.append(
+                    PointStruct(
+                        id=point_id,
+                        vector=Document(
+                            text=chunk,
+                            model=QDRANT_EMBEDDING_MODEL
+                        ),
+                        payload=payload
+                    )
+                )
 
             self.client.upsert(
                 collection_name=self.collection,
@@ -158,8 +168,8 @@ class VectorStore:
             self.get_or_create_collection()
 
         if self.store_type == "qdrant":
-            model = self._get_embedding_model()
-            query_vector = model.encode(query).tolist()
+            # model = self._get_embedding_model()
+            # query_vector = model.encode(query).tolist()
 
             query_filter = None
             if pdf_id:
@@ -172,15 +182,18 @@ class VectorStore:
                     ]
                 )
 
-            results = self.client.search(
+            results = self.client.query_points(
                 collection_name=self.collection,
-                query_vector=query_vector,
+                query=Document(
+                    text=query,
+                    model=QDRANT_EMBEDDING_MODEL
+                ),
                 query_filter=query_filter,
                 limit=top_k
             )
 
             formatted = []
-            for hit in results:
+            for hit in results.points:
                 payload = hit.payload or {}
                 doc_text = payload.get("text", "")
 
@@ -237,6 +250,32 @@ class VectorStore:
                 where={"pdf_id": {"$eq": pdf_id}}
             )
 
+    def exists(self, pdf_id: str) -> bool:
+        """Check if PDF chunks exist in the vector store"""
+        if not self.collection:
+            self.get_or_create_collection()
+
+        if self.store_type == "qdrant":
+            results, _ = self.client.scroll(
+                collection_name=self.collection,
+                scroll_filter=Filter(
+                    must=[
+                        FieldCondition(
+                            key="pdf_id",
+                            match=MatchValue(value=pdf_id)
+                        )
+                    ]
+                ),
+                limit=1
+            )
+            return len(results) > 0
+        else:
+            results = self.collection.get(
+                where={"pdf_id": {"$eq": pdf_id}},
+                limit=1
+            )
+            return len(results["ids"]) > 0
+
 
 # Global instance
 _vector_store = None
@@ -262,6 +301,12 @@ async def query_vector_store(query: str, pdf_id: str = None, top_k: int = 5) -> 
     Returns:
         List of similar chunks
     """
+    if pdf_id:
+        from core.database_manager import db
+        pdf_info = await db.get_pdf(pdf_id)
+        if pdf_info and pdf_info.get("vector_store_id"):
+            pdf_id = pdf_info["vector_store_id"]
+
     store = get_vector_store()
     return await asyncio.to_thread(store.query, query, pdf_id, top_k)
 
