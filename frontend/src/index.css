@@ -54,27 +54,196 @@ body {
   background: rgba(99, 102, 241, 0.5);
 }
 
-.markdown-body p {
-  margin: 0.5em 0;
+/* Premium Markdown Typography & Highlights */
+.markdown-body {
+  font-size: 15px;
+  line-height: 1.7;
 }
 
+.markdown-body p {
+  margin-top: 0;
+  margin-bottom: 1rem;
+}
+
+/* Headings with Display Font and Accent Colors */
+.markdown-body h1,
+.markdown-body h2,
+.markdown-body h3,
+.markdown-body h4 {
+  font-family: var(--font-sans);
+  font-weight: 600;
+  line-height: 1.35;
+  margin-top: 1.6rem;
+  margin-bottom: 0.8rem;
+  color: #111827; /* Light mode */
+}
+
+:where(.dark) .markdown-body h1,
+:where(.dark) .markdown-body h2,
+:where(.dark) .markdown-body h3,
+:where(.dark) .markdown-body h4 {
+  color: #f3f4f6; /* Dark mode */
+}
+
+.markdown-body h1 {
+  font-size: 1.5rem;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+  padding-bottom: 0.4rem;
+}
+
+:where(.dark) .markdown-body h1 {
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.markdown-body h2 {
+  font-size: 1.3rem;
+}
+
+.markdown-body h3 {
+  font-size: 1.15rem;
+}
+
+.markdown-body h4 {
+  font-size: 1.05rem;
+}
+
+/* Strong / Bold Text Highlights */
+.markdown-body strong,
+.markdown-body b {
+  font-weight: 700;
+  color: #4f46e5; /* Indigo accent for light mode */
+}
+
+:where(.dark) .markdown-body strong,
+:where(.dark) .markdown-body b {
+  color: #a5b4fc; /* Soft indigo for dark mode */
+}
+
+/* Lists and Spacing */
 .markdown-body ul,
 .markdown-body ol {
-  margin: 0.5em 0;
-  padding-left: 1.25em;
+  margin-top: 0;
+  margin-bottom: 1rem;
+  padding-left: 1.5rem;
 }
 
+.markdown-body li {
+  margin-top: 0.35rem;
+  margin-bottom: 0.35rem;
+}
+
+.markdown-body ul {
+  list-style-type: disc;
+}
+
+.markdown-body ol {
+  list-style-type: decimal;
+}
+
+/* Custom bullet markers */
+.markdown-body li::marker {
+  color: #6366f1;
+}
+
+/* Blockquotes with Premium Borders */
+.markdown-body blockquote {
+  margin: 1.25rem 0;
+  padding: 0.5rem 1.25rem;
+  border-left: 4px solid #6366f1;
+  background: rgba(99, 102, 241, 0.03);
+  color: #4b5563;
+  font-style: italic;
+  border-radius: 0 8px 8px 0;
+}
+
+:where(.dark) .markdown-body blockquote {
+  background: rgba(99, 102, 241, 0.05);
+  color: #9ca3af;
+}
+
+/* Tables Styling */
+.markdown-body table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 1.5rem 0;
+  font-size: 14px;
+}
+
+.markdown-body th,
+.markdown-body td {
+  padding: 10px 14px;
+  border: 1px solid #e5e7eb;
+}
+
+:where(.dark) .markdown-body th,
+:where(.dark) .markdown-body td {
+  border: 1px solid rgba(255, 255, 255, 0.07);
+}
+
+.markdown-body th {
+  background-color: #f9fafb;
+  font-weight: 600;
+  color: #111827;
+}
+
+:where(.dark) .markdown-body th {
+  background-color: rgba(255, 255, 255, 0.03);
+  color: #f3f4f6;
+}
+
+.markdown-body tr:nth-child(even) {
+  background-color: #fafafa;
+}
+
+:where(.dark) .markdown-body tr:nth-child(even) {
+  background-color: rgba(255, 255, 255, 0.01);
+}
+
+/* Code block adjustments (fallback wrapper) */
 .markdown-body pre {
-  background: rgba(255, 255, 255, 0.06);
-  border-radius: 8px;
-  padding: 12px;
-  overflow-x: auto;
-  font-size: 0.85em;
+  margin: 1rem 0;
+  border-radius: 12px;
+  border: 1px solid #e5e7eb;
 }
 
-.markdown-body code {
-  font-size: 0.9em;
-  background: rgba(255, 255, 255, 0.08);
-  padding: 2px 6px;
-  border-radius: 4px;
+:where(.dark) .markdown-body pre {
+  border: 1px solid rgba(255, 255, 255, 0.06);
 }
+
+/* Inline Code Highlights */
+.markdown-body :not(pre) > code {
+  font-family: monospace;
+  font-size: 0.85em;
+  background-color: #f3f4f6;
+  color: #db2777; /* Pink/Rose in light mode */
+  padding: 2px 6px;
+  border-radius: 6px;
+  font-weight: 500;
+}
+
+:where(.dark) .markdown-body :not(pre) > code {
+  background-color: rgba(99, 102, 241, 0.08);
+  color: #c084fc; /* Purple in dark mode */
+  border: 1px solid rgba(99, 102, 241, 0.15);
+}
+
+/* Link elements */
+.markdown-body a {
+  color: #4f46e5;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  transition: color 0.15s ease;
+}
+
+:where(.dark) .markdown-body a {
+  color: #818cf8;
+}
+
+.markdown-body a:hover {
+  color: #312e81;
+}
+
+:where(.dark) .markdown-body a:hover {
+  color: #a5b4fc;
+}
+

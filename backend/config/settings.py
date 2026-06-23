@@ -30,7 +30,7 @@ DATABASE_PATH = DATA_DIR / "research_agent.db"  # used only for optional SQLite 
 # API Configuration
 API_HOST = os.getenv("API_HOST", "0.0.0.0")
 API_PORT = int(os.getenv("API_PORT", 8000))
-API_RELOAD = True
+API_RELOAD = os.getenv("API_RELOAD", "False" if os.getenv("RENDER") == "true" else "True").lower() == "true"
 
 # LLM Configuration
 LLM_MODEL = os.getenv("LLM_MODEL", "llama-3.3-70b-versatile")
@@ -51,7 +51,7 @@ QDRANT_EMBEDDING_MODEL = os.getenv(
 )
 
 # Vector Store
-VECTOR_STORE_TYPE = os.getenv("VECTOR_STORE_TYPE", "chroma")  # chroma, pinecone, weaviate, qdrant
+VECTOR_STORE_TYPE = os.getenv("VECTOR_STORE_TYPE", "qdrant" if os.getenv("RENDER") == "true" else "chroma")  # chroma, pinecone, weaviate, qdrant
 VECTOR_STORE_PATH = EMBEDDINGS_DIR / "chroma_db"
 QDRANT_API_KEY = os.getenv("QDRANT_API_KEY")
 QDRANT_URL = os.getenv("QDRANT_URL")

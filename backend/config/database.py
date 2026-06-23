@@ -135,7 +135,7 @@ def init_database():
 
     conn = _connect()
     try:
-        cursor = conn.cursor()
+        cursor = conn.cursor(cursor_factory=RealDictCursor)
         
         # Remove unique constraint on arxiv_id to allow multiple sessions to store the same paper
         try:

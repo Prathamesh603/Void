@@ -22,6 +22,11 @@ async def lifespan(app: FastAPI):
     await asyncio.to_thread(init_database)
     logger.info("🚀 Research Agent API started")
     yield
+    try:
+        from agent.agent import close_pool
+        await close_pool()
+    except Exception as e:
+        logger.error(f"Error closing LangGraph Postgres checkpointer pool: {e}")
     logger.info("🛑 Research Agent API stopped")
 
 # Create FastAPI app with lifespan

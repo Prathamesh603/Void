@@ -496,17 +496,13 @@ export default function WorkspacePage() {
       )}
 
       {userModalMode && (
-        <div className={userModalMode === 'login' 
-          ? "fixed inset-0 z-50 flex bg-[#070709] w-screen h-screen overflow-hidden animate-fade-in"
-          : "fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-md p-4"
-        }>
-          <div className={userModalMode === 'login'
-            ? "relative w-full h-full grid grid-cols-1 md:grid-cols-12 bg-[#070709] text-neutral-200"
-            : "relative w-full max-w-md p-8 overflow-hidden rounded-3xl border border-neutral-800 bg-[#070709] text-neutral-200 shadow-2xl"
-          }>
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-md p-4">
+          <div className={`relative w-full overflow-hidden rounded-3xl border border-neutral-800 bg-[#070709] text-neutral-200 shadow-[0_0_50px_rgba(99,102,241,0.2)] transition-all duration-300 ${
+            userModalMode === 'login' ? 'max-w-3xl md:max-w-4xl grid grid-cols-1 md:grid-cols-12' : 'max-w-md p-8'
+          }`}>
             
             {userModalMode === 'login' && (
-              <div className="col-span-6 relative hidden md:block overflow-hidden h-full bg-black">
+              <div className="col-span-6 relative hidden md:block overflow-hidden h-full min-h-[500px] bg-black">
                 <img
                   src="/void_login_bg.png"
                   alt="Void Cosmic Background"
@@ -514,26 +510,22 @@ export default function WorkspacePage() {
                 />
                 <div className="absolute inset-0 bg-gradient-to-r from-transparent via-[#070709]/30 to-[#070709] w-full h-full" />
                 <div className="absolute inset-0 bg-gradient-to-t from-[#070709] via-transparent to-transparent w-full h-full" />
-                <div className="absolute bottom-12 left-12 right-12 text-left z-10">
+                <div className="absolute bottom-8 left-8 right-8 text-left z-10">
                   <span className="flex h-10 w-10 items-center justify-center rounded-2xl bg-white text-black text-xl font-bold shadow-md border border-neutral-200 font-display mb-3"
                   style={{ fontFamily: "'Instrument Serif', Georgia, serif" }}>
                     V
                   </span>
-                  <h4 className="text-3xl font-display font-semibold tracking-tight text-white leading-tight">
+                  <h4 className="text-2xl font-display font-semibold tracking-tight text-white leading-tight">
                     Explore the infinite void of research.
                   </h4>
-                  <p className="text-sm text-neutral-450 mt-3 font-sans max-w-sm leading-relaxed">
+                  <p className="text-xs text-neutral-450 mt-2 font-sans max-w-xs leading-relaxed">
                     A persistent research workspace powered by LangGraph, grounded in scientific papers, and organized in beautiful interactive cards.
                   </p>
                 </div>
               </div>
             )}
 
-            <div className={userModalMode === 'login' 
-              ? 'col-span-6 p-8 md:p-12 flex flex-col justify-center items-center w-full h-full bg-[#070709]' 
-              : 'bg-[#070709]'
-            }>
-              <div className={userModalMode === 'login' ? "w-full max-w-md" : "w-full"}>
+            <div className={userModalMode === 'login' ? 'col-span-6 p-8 md:p-12 flex flex-col justify-center bg-[#070709]' : 'bg-[#070709]'}>
                 {userModalMode === 'manage' && (
                   <button
                     type="button"
@@ -687,7 +679,6 @@ export default function WorkspacePage() {
                   </>
                 )}
               </div>
-            </div>
 
           </div>
         </div>

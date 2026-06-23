@@ -14,3 +14,7 @@ services:
     envVars:
       - key: PYTHON_VERSION
         value: 3.11.14
+      - key: API_RELOAD
+        value: "false"
+      - key: VECTOR_STORE_TYPE
+        value: qdrant

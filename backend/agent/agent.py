@@ -12,6 +12,11 @@ from agent.nodes import chatbot_node, should_continue
 from langchain_core.messages import SystemMessage
 from config.settings import RESEARCH_SYSTEM_PROMPT
 
+from psycopg_pool import AsyncConnectionPool
+from psycopg.rows import dict_row
+from langgraph.checkpoint.postgres.aio import AsyncPostgresSaver
+
+
 def create_tool_node_with_session(tools_list):
     """
     Custom tool node that automatically injects session_id from state.
@@ -81,7 +86,7 @@ def create_tool_node_with_session(tools_list):
     return tool_node_with_session
 
 
-def create_agent_graph():
+def create_agent_graph(checkpointer=None):
     """
     Create and compile the research agent graph.
 
@@ -117,14 +122,73 @@ def create_agent_graph():
 
     graph_builder.add_edge("tools", "chatbot")
 
-    memory = MemorySaver()
-    graph = graph_builder.compile(checkpointer=memory)
+    if checkpointer is None:
+        memory = MemorySaver()
+        graph = graph_builder.compile(checkpointer=memory)
+    else:
+        graph = graph_builder.compile(checkpointer=checkpointer)
 
     return graph
 
 
-# Create agent
-agent = create_agent_graph()
+# Global cache variables for PostgreSQL checkpointer and connection pool
+_checkpointer = None
+_pool = None
+_graph = None
+
+
+async def get_checkpointer():
+    """Lazily initialize the AsyncPostgresSaver checkpointer and connection pool"""
+    global _checkpointer, _pool
+    if _checkpointer is None:
+        from config.settings import DATABASE_URL
+        if not DATABASE_URL:
+            raise ValueError("DATABASE_URL is not configured in settings/environment variables.")
+
+        # Ensure sslmode=require for Supabase if not specified
+        url = DATABASE_URL
+        if "sslmode=" not in url:
+            sep = "&" if "?" in url else "?"
+            url = f"{url}{sep}sslmode=require"
+
+        _pool = AsyncConnectionPool(
+            conninfo=url,
+            kwargs={"autocommit": True, "row_factory": dict_row, "prepare_threshold": None},
+            min_size=1,
+            max_size=10
+        )
+        _checkpointer = AsyncPostgresSaver(_pool)
+        # Create checkpoints tables if they don't exist
+        await _checkpointer.setup()
+
+        # Ensure any missing columns from library updates are created (e.g. task_path)
+        try:
+            async with _pool.connection() as conn:
+                async with conn.cursor() as cur:
+                    await cur.execute("ALTER TABLE checkpoint_writes ADD COLUMN IF NOT EXISTS task_path text;")
+        except Exception as migration_error:
+            print(f"Warning: LangGraph checkpoint_writes migration warning: {migration_error}")
+    return _checkpointer
+
+
+async def get_agent_graph():
+    """Lazily construct, compile, and return the agent graph with Postgres checkpointer"""
+    global _graph
+    if _graph is None:
+        checkpointer = await get_checkpointer()
+        _graph = create_agent_graph(checkpointer=checkpointer)
+    return _graph
+
+
+async def close_pool():
+    """Close the database connection pool on application shutdown"""
+    global _pool, _checkpointer, _graph
+    if _pool is not None:
+        await _pool.close()
+        _pool = None
+        _checkpointer = None
+        _graph = None
+        print("✓ LangGraph Postgres checkpointer pool closed.")
 
 
 async def invoke_agent(state: AgentState, session_id: str):
@@ -144,11 +208,14 @@ async def invoke_agent(state: AgentState, session_id: str):
         for msg in state["messages"]
     ):
         state["messages"].insert(
-        0,
-        SystemMessage(content=RESEARCH_SYSTEM_PROMPT)
+            0,
+            SystemMessage(content=RESEARCH_SYSTEM_PROMPT)
         )
-    # Add session ID to state for debugging
-    result = await agent.ainvoke(
+    
+    # Get the compiled graph dynamically (lazily initialized)
+    graph = await get_agent_graph()
+
+    result = await graph.ainvoke(
         state,
         config={
             "configurable": {
@@ -158,3 +225,4 @@ async def invoke_agent(state: AgentState, session_id: str):
     )
 
     return result
+
