@@ -18,9 +18,12 @@ if __name__ == "__main__":
     print(f"📍 Server: http://{API_HOST}:{API_PORT}")
     print(f"📚 Docs: http://{API_HOST}:{API_PORT}/docs")
     
+    loop_setting = "utils.loop_selector:win_selector_loop_factory" if sys.platform == "win32" else "auto"
+    
     uvicorn.run(
         "api.main:app",
         host=API_HOST,
         port=API_PORT,
-        reload=API_RELOAD
+        reload=API_RELOAD,
+        loop=loop_setting
     )

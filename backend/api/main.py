@@ -21,6 +21,8 @@ from utils.logger import logger
 # Lifespan context manager
 @asynccontextmanager
 async def lifespan(app: FastAPI):
+    loop = asyncio.get_running_loop()
+    logger.info(f"Active event loop: {type(loop).__name__}")
     await asyncio.to_thread(init_database)
     logger.info("🚀 Research Agent API started")
     yield
@@ -61,10 +63,13 @@ if __name__ == "__main__":
     import uvicorn
     from config.settings import API_HOST, API_PORT
     
+    loop_setting = "utils.loop_selector:win_selector_loop_factory" if sys.platform == "win32" else "auto"
+    
     # Run without reload to avoid continuous restarts
     uvicorn.run(
         "api.main:app",
         host=API_HOST,
         port=API_PORT,
-        reload=False  # Disable reload (app was getting stuck on reload)
+        reload=False,  # Disable reload (app was getting stuck on reload)
+        loop=loop_setting
     )
