@@ -115,11 +115,11 @@ export default function ChatPanel({
                   className={`flex ${m.role === 'user' ? 'justify-end' : 'justify-start'}`}
                 >
                   <div
-                    className={`max-w-[82%] rounded-2xl px-4 py-3 text-[15px] leading-[1.65] ${
+                    className={
                       m.role === 'user'
-                        ? 'bg-indigo-600/90 backdrop-blur-md text-white shadow-lg shadow-indigo-500/20 border border-indigo-500/30'
-                        : 'bg-white/60 dark:bg-white/[0.04] backdrop-blur-md text-neutral-800 dark:text-neutral-200 border border-neutral-200/70 dark:border-white/[0.07] shadow-sm shadow-black/5'
-                    }`}
+                        ? 'max-w-[82%] rounded-2xl px-4 py-3 text-[15px] leading-[1.65] bg-indigo-600/90 backdrop-blur-md text-white shadow-lg shadow-indigo-500/20 border border-indigo-500/30'
+                        : 'max-w-[92%] py-2 text-[15px] leading-[1.65] text-neutral-800 dark:text-neutral-200'
+                    }
                   >
                     {m.role === 'assistant' ? (
                       <div className="markdown-body prose-invert prose-neutral max-w-none">
@@ -131,7 +131,7 @@ export default function ChatPanel({
                                 <SyntaxHighlighter
                                   style={vscDarkPlus}
                                   language={match[1]}
-                                  PreTag="div"
+                                  PreTag="pre"
                                   className="rounded-lg my-3 overflow-hidden text-sm"
                                   {...props}
                                 >

@@ -371,7 +371,7 @@ export default function WorkspacePage() {
 
       const enrichedMessage = `IMPORTANT: Do NOT use any tools. Answer ONLY from the excerpts below.\n\nThe user is asking about the paper "${paperTitle}".\n\nRelevant excerpts from the paper:\n${context}\n\nUser question: ${query}\n\nPlease provide a clear, well-structured answer based ONLY on the paper excerpts above. Do not search for new papers.`;
 
-      const res = await sendChat(currentSessionId, enrichedMessage);
+      const res = await sendChat(currentSessionId, enrichedMessage, `📄 [Paper Query] ${query}`);
       setMessages((prev) => [
         ...prev,
         {

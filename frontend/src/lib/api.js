@@ -143,10 +143,12 @@ export function getMessages(sessionId) {
   return request(`/sessions/${sessionId}/messages`);
 }
 
-export function sendChat(sessionId, message) {
+export function sendChat(sessionId, message, displayMessage = null) {
+  const body = { session_id: sessionId, message };
+  if (displayMessage) body.display_message = displayMessage;
   return request(`/sessions/${sessionId}/chat`, {
     method: 'POST',
-    body: JSON.stringify({ session_id: sessionId, message }),
+    body: JSON.stringify(body),
   });
 }
 
