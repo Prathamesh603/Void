@@ -10,17 +10,17 @@ from agent.tools import tools
 from langchain_google_genai import ChatGoogleGenerativeAI
 
 #Gemini Model
-llm = ChatGoogleGenerativeAI(
-    model="gemini-2.5-flash",
-    google_api_key=GEMINI_API_KEY
-)
+# llm = ChatGoogleGenerativeAI(
+#     model="gemini-2.5-flash",
+#     google_api_key=GEMINI_API_KEY
+# )
 
 # # Initialize LLM
-# llm = ChatGroq(
-#     model=LLM_MODEL,
-#     temperature=LLM_TEMPERATURE,
-#     api_key=GROQ_API_KEY
-# )
+llm = ChatGroq(
+    model=LLM_MODEL,
+    temperature=LLM_TEMPERATURE,
+    api_key=GROQ_API_KEY
+)
 
 # Bind tools to LLM
 llm_with_tools = llm.bind_tools(tools)
