@@ -52,8 +52,8 @@ QDRANT_EMBEDDING_MODEL = os.getenv(
 )
 
 # Vector Store
-VECTOR_STORE_TYPE = os.getenv("VECTOR_STORE_TYPE", "qdrant" if os.getenv("RENDER") == "true" else "chroma")  # chroma, pinecone, weaviate, qdrant
-VECTOR_STORE_PATH = EMBEDDINGS_DIR / "chroma_db"
+VECTOR_STORE_TYPE = os.getenv("VECTOR_STORE_TYPE", "qdrant")  # qdrant (default), chroma (legacy)
+VECTOR_STORE_PATH = EMBEDDINGS_DIR / "chroma_db"  # only used if VECTOR_STORE_TYPE=chroma (legacy)
 QDRANT_API_KEY = os.getenv("QDRANT_API_KEY")
 QDRANT_URL = os.getenv("QDRANT_URL")
 
