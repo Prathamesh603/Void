@@ -4,17 +4,23 @@ Each node is a function that processes state
 """
 from langchain_groq import ChatGroq
 from langchain_core.messages import SystemMessage
-from config.settings import LLM_MODEL, LLM_TEMPERATURE, GROQ_API_KEY
+from config.settings import LLM_MODEL, LLM_TEMPERATURE, GROQ_API_KEY, GEMINI_API_KEY
 from agent.state import AgentState
 from agent.tools import tools
+from langchain_google_genai import ChatGoogleGenerativeAI
 
-
-# Initialize LLM
-llm = ChatGroq(
-    model=LLM_MODEL,
-    temperature=LLM_TEMPERATURE,
-    api_key=GROQ_API_KEY
+#Gemini Model
+llm = ChatGoogleGenerativeAI(
+    model="gemini-2.5-flash",
+    google_api_key=GEMINI_API_KEY
 )
+
+# # Initialize LLM
+# llm = ChatGroq(
+#     model=LLM_MODEL,
+#     temperature=LLM_TEMPERATURE,
+#     api_key=GROQ_API_KEY
+# )
 
 # Bind tools to LLM
 llm_with_tools = llm.bind_tools(tools)

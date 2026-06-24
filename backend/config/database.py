@@ -186,7 +186,7 @@ def init_database():
             "ALTER TABLE users ADD COLUMN IF NOT EXISTS password_hash TEXT"
         )
         conn.commit()
-        print("✓ Database initialized on Supabase (PostgreSQL)")
+        print("[OK] Database initialized on Supabase (PostgreSQL)")
     finally:
         conn.close()
 
@@ -270,7 +270,7 @@ def migrate_sqlite_to_postgres():
             pg_conn.commit()
             print(f"Migrated {len(rows)} row(s) into {table}")
 
-        print("✓ SQLite migration finished")
+        print("[OK] SQLite migration finished")
     finally:
         sqlite_conn.close()
         pg_conn.close()

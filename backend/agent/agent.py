@@ -2,6 +2,10 @@
 LangGraph agent compilation and execution
 """
 import asyncio
+import sys
+if sys.platform == "win32":
+    asyncio.set_event_loop_policy(asyncio.WindowsSelectorEventLoopPolicy())
+
 from langgraph.graph import StateGraph, START, END
 from langgraph.checkpoint.memory import MemorySaver
 from langchain_core.messages import SystemMessage, ToolMessage
@@ -188,7 +192,7 @@ async def close_pool():
         _pool = None
         _checkpointer = None
         _graph = None
-        print("✓ LangGraph Postgres checkpointer pool closed.")
+        print("[OK] LangGraph Postgres checkpointer pool closed.")
 
 
 async def invoke_agent(state: AgentState, session_id: str):

@@ -76,6 +76,7 @@ class ChatRequest(BaseModel):
     """Chat message request"""
     session_id: str
     message: str
+    display_message: Optional[str] = None  # Clean user-facing message (saved to DB instead of enriched prompt)
 
 
 class ToolCall(BaseModel):

@@ -243,30 +243,48 @@ async def chat_session(
         logger.info(f"get the result from the agent")
         last_message = result["messages"][-1]
         logger.info(f"get the last message from the agent")
-        tool_used_message = last_message
-        response_text = last_message.content if hasattr(last_message, "content") else str(last_message)
+        response_text = last_message.content if hasattr(last_message, "content") else last_message
+        if isinstance(response_text, dict):
+            response_text = json.dumps(response_text)
+        elif isinstance(response_text, list):
+            try:
+                texts = []
+                for item in response_text:
+                    if isinstance(item, dict) and "text" in item:
+                        texts.append(item["text"])
+                    elif isinstance(item, str):
+                        texts.append(item)
+                    else:
+                        texts.append(json.dumps(item))
+                response_text = "\n".join(texts)
+            except Exception: 
+                response_text = json.dumps(response_text)
+        elif not isinstance(response_text, str):
+            response_text = str(response_text)
         logger.info(f"get the response text from the last message")
 
         tools_used = []
         tools_used_for_db = []
-        if hasattr(tool_used_message, "tool_calls") and tool_used_message.tool_calls:
-            for tool_call in tool_used_message.tool_calls:
-                tool_name = tool_call.get("name") if isinstance(tool_call, dict) else getattr(tool_call, "name", "unknown")
-                tools_used.append(ToolCall(
-                    tool_name=tool_name,
-                    status="executed",
-                ))
-                tools_used_for_db.append({
-                    "tool_name": tool_name,
-                    "status": "executed",
-                })
+        # Extract tool calls from all messages in this run
+        for msg in result.get("messages", []):
+            if hasattr(msg, "tool_calls") and msg.tool_calls:
+                for tool_call in msg.tool_calls:
+                    tool_name = tool_call.get("name") if isinstance(tool_call, dict) else getattr(tool_call, "name", "unknown")
+                    tools_used.append(ToolCall(
+                        tool_name=tool_name,
+                        status="executed",
+                    ))
+                    tools_used_for_db.append({
+                        "tool_name": tool_name,
+                        "status": "executed",
+                    })
         logger.info(f"tools used in this message {tools_used}")
 
         await db.save_message(
             session_id=session_id,
-            user_message=message_text,
+            user_message=request.display_message or message_text,
             agent_response=response_text,
-            tools_used=json.dumps(tools_used_for_db) if tools_used_for_db else None,
+            tools_used=None,
         )
 
         logger.info(f"Chat completed for session {session_id}")
@@ -332,8 +350,24 @@ async def chat_legacy(
 
         result = await invoke_agent(state, request.session_id)
 
-        last_message = result["messages"][-1]
-        response_text = last_message.content if hasattr(last_message, "content") else str(last_message)
+        response_text = last_message.content if hasattr(last_message, "content") else last_message
+        if isinstance(response_text, dict):
+            response_text = json.dumps(response_text)
+        elif isinstance(response_text, list):
+            try:
+                texts = []
+                for item in response_text:
+                    if isinstance(item, dict) and "text" in item:
+                        texts.append(item["text"])
+                    elif isinstance(item, str):
+                        texts.append(item)
+                    else:
+                        texts.append(json.dumps(item))
+                response_text = "\n".join(texts)
+            except Exception:
+                response_text = json.dumps(response_text)
+        elif not isinstance(response_text, str):
+            response_text = str(response_text)
 
         tools_used = []
         tools_used_for_db = []
