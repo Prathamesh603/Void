@@ -29,7 +29,7 @@ DATABASE_PATH = DATA_DIR / "research_agent.db"  # used only for optional SQLite 
 
 # API Configuration
 API_HOST = os.getenv("API_HOST", "0.0.0.0")
-API_PORT = int(os.getenv("API_PORT", 8000))
+API_PORT = int(os.getenv("API_PORT", 8080))
 API_RELOAD = os.getenv("API_RELOAD", "False" if os.getenv("RENDER") == "true" else "True").lower() == "true"
 
 # LLM Configuration
