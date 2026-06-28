@@ -56,16 +56,15 @@ export default function ChatHistoryPanel({
                   animate={{ opacity: 1, x: 0 }}
                 >
                   <div
-                    className={`group flex items-center gap-1 rounded-lg transition ${
-                      active ? 'bg-indigo-500/10 dark:bg-indigo-600/25 ring-1 ring-indigo-500/30 dark:ring-indigo-500/40' : 'hover:bg-neutral-200/50 dark:hover:bg-white/5'
-                    }`}
+                    className={`group flex items-center gap-1 rounded-lg transition ${active ? 'bg-indigo-500/10 dark:bg-indigo-600/25 ring-1 ring-indigo-500/30 dark:ring-indigo-500/40' : 'hover:bg-neutral-200/50 dark:hover:bg-white/5'
+                      }`}
                   >
                     <button
                       type="button"
                       onClick={() => onSelect(s.session_id)}
                       className="min-w-0 flex-1 px-3 py-2.5 text-left"
                     >
-                      <p className="truncate text-sm font-medium text-neutral-900 dark:text-neutral-100">
+                      <p className="text-sm font-semibold text-neutral-800 dark:text-neutral-300 font-displaytext-sm font-medium text-neutral-900 dark:text-neutral-200 font-sans tracking-tight">
                         {s.session_name || 'Untitled'}
                       </p>
                       <p className="text-[11px] text-neutral-500 dark:text-neutral-400">

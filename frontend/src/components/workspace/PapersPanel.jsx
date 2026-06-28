@@ -216,11 +216,11 @@ export default function PapersPanel({
                     <div className="flex items-start gap-2">
                       <FileText className="h-4 w-4 shrink-0 text-indigo-500 dark:text-indigo-400 mt-0.5" />
                       <div className="min-w-0 flex-1">
-                        <p className="line-clamp-2 text-[15px] font-semibold leading-6 text-neutral-900 dark:text-neutral-100">
-                        </p>
+                        <p className="text-sm font-medium text-neutral-900 dark:text-neutral-200 font-sans tracking-tight">
+                          {paper.title}</p>
                         {paper.arxiv_id && (
                           <p className="mt-1 text-[11px] text-neutral-500 dark:text-neutral-400 font-sans">
-                            arXiv:{paper.arxiv_id}
+                            arxiv_id: {paper.arxiv_id}
                           </p>
                         )}
                         <div className="mt-2 flex items-center gap-2">

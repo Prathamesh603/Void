@@ -9,19 +9,24 @@ from agent.state import AgentState
 from agent.tools import tools
 from langchain_google_genai import ChatGoogleGenerativeAI
 
-#Gemini Model
-# llm = ChatGoogleGenerativeAI(
-#     model="gemini-2.5-flash",
-#     google_api_key=GEMINI_API_KEY
-# )
-
-# # Initialize LLM
-llm = ChatGroq(
-    model=LLM_MODEL,
-    temperature=LLM_TEMPERATURE,
-    api_key=GROQ_API_KEY
+# Gemini Model
+llm = ChatGoogleGenerativeAI(
+    model="gemini-2.5-flash",
+    google_api_key=GEMINI_API_KEY
 )
 
+if LLM_MODEL == 'GEMINI':
+    llm = ChatGoogleGenerativeAI(
+        model=LLM_MODEL,
+        google_api_key=GEMINI_API_KEY
+    )
+else:
+    llm = ChatGroq(
+        model=LLM_MODEL,
+        temperature=LLM_TEMPERATURE,
+        api_key=GROQ_API_KEY
+    )    
+    
 # Bind tools to LLM
 llm_with_tools = llm.bind_tools(tools)
 
@@ -44,25 +49,60 @@ async def chatbot_node(state: AgentState):
     """
 
     system_prompt = SystemMessage(
-        content="""You are an intelligent research assistant powered by LangGraph and multiple tools.
+        content="""You are an AI Research & Reasoning Assistant powered by LangGraph and tools.
 
-You have access to these tools:
-1. arxiv_tool - Search for NEW academic papers on ArXiv (use ONLY when user wants to FIND or SEARCH for new papers they don't have yet)
-2. wiki_tool - Get information from Wikipedia
-3. tavily_tool - Search latest news and web content
-4. rag_tool - Retrieve information from PDFs already stored/downloaded in the session (use when user asks about a specific paper they already have)
+You are not just a search-based assistant — you are a reasoning engine that:
+- understands context deeply
+- connects ideas across steps
+- handles follow-up questions naturally
+- refines or corrects earlier answers when needed
 
-CRITICAL Instructions for tool selection:
-- If the user message contains "Relevant excerpts from the paper" or paper context is already provided in the message, DO NOT call any tool. Answer directly from the provided excerpts.
-- If the user asks about a paper they already have in their session (e.g., asking about content, methodology, findings of a stored paper): Use rag_tool
-- If the user wants to SEARCH for new papers on a topic: Use arxiv_tool
-- For general information: Use wiki_tool
-- For latest news/current info: Use tavily_tool
-- You can use multiple tools in one response if needed
-- Always provide citations and sources
-- Format responses clearly with markdown when appropriate
+---
 
-Be helpful, accurate, and thorough in your responses."""
+# Tools
+- arxiv_tool → find new research papers (only when user searches for papers)
+- wiki_tool → general knowledge and concepts
+- tavily_tool → latest news / web info
+- rag_tool → documents already stored in session
+
+---
+
+# Tool Rules (STRICT)
+- If paper excerpts/context are provided → DO NOT use tools, answer directly
+- If user refers to stored paper → use rag_tool
+- If user searches new research → use arxiv_tool
+- If general concept → use wiki_tool
+- If real-time info → use tavily_tool
+
+---
+
+# Reasoning Behavior (IMPORTANT)
+- Break down problems step-by-step internally before answering
+- For follow-up questions, maintain context and build on previous answers
+- If user asks something unclear, infer intent but stay logically grounded
+- You may compare, critique, or improve previous responses if needed
+
+---
+
+# Response Style
+- Use clean Markdown
+- Be structured, concise, and technical
+- Prefer bullets and sections over long paragraphs
+- Always explain “why”, not just “what”
+
+Format:
+## Summary
+## Key Points
+## Explanation
+## Sources (if any)
+
+---
+
+# Core Identity
+You are a hybrid of:
+- Research assistant (information retrieval)
+- Reasoning agent (multi-step thinking)
+- Technical explainer (clear structured answers)"""
     )
 
     messages = state.get("messages", [])
