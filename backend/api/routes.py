@@ -738,7 +738,7 @@ async def query_pdf(
                 page=result["metadata"].get("page", "N/A"),
                 relevance_score=f"{result['score']:.2f}",
             ))
-
+        logger.info(f"Rag query results: {chunks}")
         return RAGQueryResponse(
             status="success",
             chunks_found=len(chunks),

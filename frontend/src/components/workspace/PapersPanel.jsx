@@ -174,7 +174,7 @@ export default function PapersPanel({
             {[1, 2, 3].map((n) => (
               <div
                 key={n}
-                className="w-full rounded-xl border border-neutral-200 dark:border-white/10 bg-white dark:bg-void-800/80 p-3 animate-pulse"
+                className="group w-full rounded-2xl bg-white/70 dark:bg-white/[0.03] backdrop-blur-sm p-4 transition-all duration-200 hover:bg-white dark:hover:bg-white/[0.05]"
               >
                 <div className="flex items-start gap-2">
                   <div className="h-4 w-4 shrink-0 rounded bg-neutral-200 dark:bg-neutral-700 mt-0.5" />
@@ -216,8 +216,7 @@ export default function PapersPanel({
                     <div className="flex items-start gap-2">
                       <FileText className="h-4 w-4 shrink-0 text-indigo-500 dark:text-indigo-400 mt-0.5" />
                       <div className="min-w-0 flex-1">
-                        <p className="line-clamp-2 text-sm font-medium text-neutral-900 dark:text-neutral-100 font-display">
-                          {paper.title}
+                        <p className="line-clamp-2 text-[15px] font-semibold leading-6 text-neutral-900 dark:text-neutral-100">
                         </p>
                         {paper.arxiv_id && (
                           <p className="mt-1 text-[11px] text-neutral-500 dark:text-neutral-400 font-sans">
@@ -226,7 +225,7 @@ export default function PapersPanel({
                         )}
                         <div className="mt-2 flex items-center gap-2">
                           {isDownloaded && (
-                            <span className="inline-flex items-center gap-1 text-[10px] text-emerald-600 dark:text-emerald-450 font-sans font-medium">
+                            <span className="inline-flex items-center gap-1 rounded-full bg-emerald-500/10 px-2 py-1 text-[10px] font-medium text-emerald-600 dark:text-emerald-400">
                               <CheckCircle2 className="h-3 w-3" />
                               Indexed
                             </span>

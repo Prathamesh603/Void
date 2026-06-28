@@ -43,7 +43,9 @@ export default function ChatPanel({
 
       {/* Header */}
       <div className="relative z-10 border-b border-neutral-200 dark:border-white/10 px-5 py-3 bg-white/80 dark:bg-void-950/80 backdrop-blur-sm transition-colors">
-        <h2 className="text-sm font-semibold tracking-tight text-neutral-800 dark:text-neutral-300 font-display">Chat</h2>
+        <h2 className="mt-2 text-sm font-semibold tracking-tight text-neutral-800 dark:text-neutral-300 font-display">
+          Chat
+        </h2>
         {sessionName && (
           <p className="truncate text-xs text-neutral-400 dark:text-neutral-500 mt-0.5 font-display tracking-wide">{sessionName}</p>
         )}
@@ -185,7 +187,7 @@ export default function ChatPanel({
       </div>
 
       {/* Input bar — sticky, no outer glow container causing layout shift */}
-      <div className="relative z-10 px-4 pb-4 pt-3 bg-transparent">
+      <div className="relative z-10 px-4 pb-0 pt-3 bg-transparent">
 
         {/* Subtle fade from below messages into input area */}
         <div className="pointer-events-none absolute inset-x-0 -top-8 h-8 bg-gradient-to-b from-transparent to-white/80 dark:to-void-950/80" />
@@ -216,6 +218,9 @@ export default function ChatPanel({
             <ArrowUp className="h-4 w-4" />
           </button>
         </form>
+        <div className="mt-2 text-xs text-neutral-400 dark:text-neutral-500 text-center mb--4">
+          Void can make mistakes. Double check important info.
+        </div>
       </div>
     </div>
   );
