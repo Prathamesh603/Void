@@ -210,7 +210,7 @@ export default function ChatPanel({
             onChange={(e) => setInput(e.target.value)}
             placeholder="Ask a research question…"
             disabled={loading || switchingSession}
-            className="flex-1 bg-transparent px-3 py-2 text-[15px] text-ink dark:text-neutral-100 placeholder:text-neutral-400 dark:placeholder:text-neutral-500 outline-none font-sans"
+            className="flex-1 bg-transparent px-3 py-2 text-[15px] dark:text-neutral-100 placeholder:text-neutral-400 dark:placeholder:text-neutral-500 outline-none font-sans"
           />
 
           <button
