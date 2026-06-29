@@ -63,11 +63,10 @@ export default function ChatHistoryPanel({
                   animate={{ opacity: 1, x: 0 }}
                 >
                   <div
-                    className={`group flex items-center gap-1 rounded-lg transition ${
-                      active
-                        ? 'workspace-session-active'
-                        : 'hover:bg-white/60 dark:hover:bg-white/5'
-                    }`}
+                    className={`group flex items-center gap-1 rounded-lg transition ${active
+                      ? 'workspace-session-active'
+                      : 'hover:bg-white/60 dark:hover:bg-white/5'
+                      }`}
                   >
                     <button
                       type="button"
@@ -107,8 +106,8 @@ export default function ChatHistoryPanel({
           </p>
           <div className="flex items-center justify-between rounded-xl border border-neutral-200/60 dark:border-white/10 bg-white/80 dark:bg-void-900/50 p-2.5 shadow-sm">
             <div className="min-w-0 flex-1 flex items-center gap-2">
-              <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-foreground text-background font-display italic text-sm">
-                {currentUser.email ? currentUser.email[0].toUpperCase() : 'U'}
+              <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-gradient-to-br from-cyan-500 to-blue-600 text-white font-display italic text-sm font-semibold shadow-sm">
+                {(currentUser.email?.charAt(0) || 'U').toUpperCase()}
               </div>
               <div className="min-w-0">
                 <p className="truncate text-xs font-medium text-neutral-800 dark:text-neutral-200">
