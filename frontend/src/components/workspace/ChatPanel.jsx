@@ -216,7 +216,13 @@ export default function ChatPanel({
           <button
             type="submit"
             disabled={loading || switchingSession || !input.trim()}
-            className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl workspace-btn-primary transition-all disabled:opacity-40 hover:scale-105 active:scale-95 shadow-sm"
+            className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl 
+                      bg-gradient-to-r from-orange-500 to-pink-500 
+                      text-white transition-all 
+                      shadow-[0_0_15px_rgba(255,120,0,0.6)] 
+                      hover:scale-105 active:scale-95 
+                      hover:shadow-[0_0_25px_rgba(255,80,150,0.8)] 
+                      disabled:opacity-40"
           >
             <ArrowUp className="h-4 w-4" />
           </button>
