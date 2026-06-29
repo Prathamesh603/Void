@@ -560,7 +560,7 @@ export default function WorkspacePage() {
 
               <div className="text-center mb-6">
                 {userModalMode !== 'login' && (
-                  <span className="inline-flex h-11 w-11 items-center justify-center rounded-lg bg-foreground text-background font-display italic text-lg shadow-sm mb-3">
+                  <span className="inline-flex h-11 w-11 items-center justify-center rounded-lg text-background font-display italic text-lg shadow-sm mb-3">
                     <img src="/favicon.png"></img>
                   </span>
                 )}
