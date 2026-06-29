@@ -419,7 +419,7 @@ export default function WorkspacePage() {
         <div className="flex items-center gap-4">
           <Link
             to="/"
-            className="flex items-center gap-2 font-display text-xl font-normal tracking-tight text-ink hover:opacity-80 transition"
+            className="flex items-center gap-2 font-display text-xl font-normal tracking-tight text-neutral-900 dark:text-neutral-100 hover:opacity-80 transition"
           >
             <span className="flex h-8 w-8 items-center justify-center rounded-lg font-display italic text-base shadow-sm">
               <img src="/favicon.png"></img>

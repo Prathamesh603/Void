@@ -42,7 +42,7 @@ export default function ChatPanel({
       <div className="relative z-10 border-b border-neutral-200/50 dark:border-white/10 px-5 py-3.5 bg-white/60 dark:bg-void-950/80 backdrop-blur-sm">
         <div className="flex items-baseline justify-between gap-3">
           <div>
-            <h2 className="font-display text-base font-normal tracking-tight text-ink dark:text-neutral-200">
+            <h2 className="font-display text-base font-normal tracking-tight  dark:text-neutral-200">
               {isNewSession ? 'New शोध session' : 'Research chat'}
             </h2>
             {sessionName && (
@@ -83,9 +83,9 @@ export default function ChatPanel({
               <span>{quote.deva}</span>
               <span>✦</span>
             </p>
-            <p className="mt-1 text-[11px] text-neutral-400 italic">{quote.gloss}</p>
+            <p className="mt-1 text-[11px] text-neutral-400 italic">naलaइtह</p>
 
-            <h3 className="mt-8 font-display text-2xl md:text-3xl font-normal tracking-tight text-ink dark:text-neutral-100">
+            <h3 className="mt-8 font-display text-2xl md:text-3xl font-normal tracking-tight dark:text-neutral-100">
               {isNewSession ? (
                 <>Begin your <em className="italic">शोध.</em></>
               ) : (
@@ -120,7 +120,7 @@ export default function ChatPanel({
                   className={`flex ${m.role === 'user' ? 'justify-end' : 'justify-start'}`}
                 >
                   {m.role === 'assistant' && (
-                    <div className="mr-2 mt-1 flex h-6 w-6 shrink-0 items-center justify-center rounded  font-display italic text-xs">
+                    <div className="mr-2 mt-1 flex h-6 w-6 shrink-0 items-center justify-center rounded font-display italic text-xs">
                       <img src="/favicon.png"></img>
                     </div>
                   )}

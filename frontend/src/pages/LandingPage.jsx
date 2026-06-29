@@ -218,12 +218,12 @@ export default function LandingPage() {
               </div>
               <div className="col-span-12 md:col-span-6 bg-[#fcfbf9] p-6 flex flex-col relative">
                 <div className="flex items-center gap-3 mb-6">
-                  <div className="h-6 w-6 rounded bg-neutral-900 text-white flex items-center justify-center font-display italic text-sm">T</div>
+                  <div className="h-6 w-6 rounded  text-white flex items-center justify-center font-display italic text-sm"><img src="favicon.png"></img></div>
                   <p className="text-sm font-medium text-neutral-800">How do we optimize transformer inference?</p>
                 </div>
                 <div className="flex gap-3 mb-6">
                   <div className="h-6 w-6 rounded-full bg-indigo-50 border border-indigo-100 flex items-center justify-center flex-shrink-0">
-                    <Sparkles className="h-3 w-3 text-indigo-500" />
+                    <Sparkles className="h-3 w-3 text-orange-400" />
                   </div>
                   <div className="space-y-3">
                     <p className="text-[13px] leading-relaxed text-neutral-600">Based on the retrieved papers, optimizing transformer inference primarily focuses on several key areas: model quantization, KV cache optimization, and efficient attention mechanisms.</p>
@@ -343,8 +343,8 @@ export default function LandingPage() {
           </div>
         </section>
 
-        {/* Section 3: Philosophy Section (Knowledge that liberates.) */}
-        <section id="philosophy" className="relative min-h-[85vh] flex flex-col items-center justify-center px-6 py-28 overflow-hidden bg-[#faf6f0] border-t border-neutral-200/30">
+        {/* Section 4: Philosophy Section (Knowledge that liberates.) */}
+        <section id="philosophy" className="relative min-h-[90vh] flex flex-col items-center justify-center px-6 py-28 overflow-hidden bg-[#faf6f0] border-t border-neutral-200/30">
           {/* Symmetrical ambient gradient underlay */}
           <div className="absolute inset-0 ambient-glow-bg-strong z-0" />
 
@@ -402,7 +402,7 @@ export default function LandingPage() {
       </main>
 
       {/* Footer styled clean and minimal like reference 1 */}
-      <footer className="border-t border-neutral-200/40 bg-[#faf6f0] px-8 py-10 relative z-10">
+      <footer className="border-t border-neutral-200/40 bg-[#faf6f0] px-8 py-5 relative z-10">
         <div className="mx-auto max-w-7xl flex flex-col md:flex-row items-center justify-between gap-6 text-[13px] text-neutral-500 font-medium">
           <div className="font-display italic text-lg text-black">Techshodh</div>
           <div>Made with 💖 in Bharat • © 2026</div>

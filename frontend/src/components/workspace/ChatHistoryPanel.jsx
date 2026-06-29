@@ -36,7 +36,7 @@ export default function ChatHistoryPanel({
         <button
           type="button"
           onClick={onNew}
-          className="flex w-full items-center justify-center gap-2 rounded-xl border border-neutral-200/70 dark:border-white/15 bg-white dark:bg-white/5 px-4 py-2.5 text-sm font-medium text-ink dark:text-neutral-200 transition hover:bg-neutral-50 dark:hover:bg-white/10 hover:shadow-sm shadow-sm"
+          className="flex w-full items-center justify-center gap-2 rounded-xl border border-neutral-200/70 dark:border-white/15 bg-white dark:bg-white/5 px-4 py-2.5 text-sm font-medium  dark:text-neutral-200 transition hover:bg-neutral-50 dark:hover:bg-white/10 hover:shadow-sm shadow-sm"
         >
           <MessageSquarePlus className="h-4 w-4" />
           New शोध session
