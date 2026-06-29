@@ -104,7 +104,13 @@ export default function PapersPanel({
             <button
               type="submit"
               disabled={queryLoading || !pdfQuery.trim()}
-              className="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl workspace-btn-primary disabled:opacity-40 transition"
+              className="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl workspace-btn-primary disabled:opacity-40 
+                      bg-gradient-to-r from-orange-500 to-pink-500 
+                      text-white transition-all 
+                      shadow-[0_0_15px_rgba(255,120,0,0.6)] 
+                      hover:scale-105 active:scale-95 
+                      hover:shadow-[0_0_25px_rgba(255,80,150,0.8)] 
+                      disabled:opacity-40"
             >
               {queryLoading ? (
                 <Loader2 className="h-3.5 w-3.5 animate-spin" />
