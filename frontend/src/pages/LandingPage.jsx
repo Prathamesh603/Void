@@ -218,7 +218,7 @@ export default function LandingPage() {
               </div>
               <div className="col-span-12 md:col-span-6 bg-[#fcfbf9] p-6 flex flex-col relative">
                 <div className="flex items-center gap-3 mb-6">
-                  <div className="h-6 w-6 rounded  text-white flex items-center justify-center font-display italic text-sm"><img src="favicon.png"></img></div>
+                  <div className="h-6 w-6 rounded  text-white flex items-center justify-center font-display italic text-sm"><img src="/favicon.png"></img></div>
                   <p className="text-sm font-medium text-neutral-800">How do we optimize transformer inference?</p>
                 </div>
                 <div className="flex gap-3 mb-6">

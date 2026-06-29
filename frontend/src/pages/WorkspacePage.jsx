@@ -561,7 +561,7 @@ export default function WorkspacePage() {
               <div className="text-center mb-6">
                 {userModalMode !== 'login' && (
                   <span className="inline-flex h-11 w-11 items-center justify-center rounded-lg bg-foreground text-background font-display italic text-lg shadow-sm mb-3">
-                    <img src="favicon.png"></img>
+                    <img src="/favicon.png"></img>
                   </span>
                 )}
                 <h3 className="font-display text-2xl font-normal tracking-tight text-ink dark:text-neutral-100">
