@@ -25,6 +25,7 @@ import {
   register,
   fetchCurrentUser,
 } from '../lib/api';
+import { WORKSPACE_QUOTES } from '../lib/constants';
 
 export default function WorkspacePage() {
   const { sessionId: routeSessionId } = useParams();
@@ -42,7 +43,7 @@ export default function WorkspacePage() {
   const [modalError, setModalError] = useState('');
 
   const [theme, setTheme] = useState(() => {
-    return localStorage.getItem('void_theme') || 'dark';
+    return localStorage.getItem('techshodh_theme') || 'light';
   });
 
   const [ready, setReady] = useState(false);
@@ -172,7 +173,7 @@ export default function WorkspacePage() {
     } else {
       document.documentElement.classList.remove('dark');
     }
-    localStorage.setItem('void_theme', theme);
+    localStorage.setItem('techshodh_theme', theme);
   }, [theme]);
 
   useEffect(() => {
@@ -207,7 +208,7 @@ export default function WorkspacePage() {
 
   useEffect(() => {
     if (!currentSessionId || isNewSession) return;
-    
+
     (async () => {
       setSwitchingSession(true);
       try {
@@ -400,8 +401,10 @@ export default function WorkspacePage() {
 
   if (!ready) {
     return (
-      <div className="flex h-screen items-center justify-center bg-white dark:bg-void-950 text-neutral-500 dark:text-neutral-400 transition-colors duration-300">
-        <Loader2 className="h-8 w-8 animate-spin text-indigo-500" />
+      <div className="flex h-screen flex-col items-center justify-center bg-background text-neutral-500 transition-colors duration-300">
+        <span className="font-display italic text-2xl text-ink mb-6">Techshodh</span>
+        <Loader2 className="h-7 w-7 animate-spin text-neutral-400" />
+        <p className="mt-4 font-deva text-sm text-neutral-400">विद्या ददाति विनयम्</p>
       </div>
     );
   }
@@ -410,36 +413,35 @@ export default function WorkspacePage() {
     <motion.div
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
-      className="flex h-screen flex-col bg-[#fafafa] dark:bg-void-950 text-neutral-900 dark:text-neutral-200 transition-colors duration-300 font-sans"
+      className="workspace-shell relative flex h-screen flex-col font-sans transition-colors duration-300"
     >
-      <header className="flex h-12 shrink-0 items-center justify-between border-b border-neutral-200 dark:border-white/10 bg-white dark:bg-[#0a0a0b] px-4 transition-colors duration-300">
-        <div className="flex items-center gap-3 font-display">
+      <header className="workspace-header relative z-20 flex h-14 shrink-0 items-center justify-between px-5">
+        <div className="flex items-center gap-4">
           <Link
             to="/"
-            className="flex items-center gap-2 text-base font-semibold text-neutral-900 dark:text-neutral-200 hover:text-neutral-950 dark:hover:text-white transition"
+            className="flex items-center gap-2 font-display text-xl font-normal tracking-tight text-ink hover:opacity-80 transition"
           >
-            <span className="flex h-9 w-9 items-center justify-center rounded-2xl bg-black text-white text-base font-bold shadow-md border border-neutral-800"
-            style={{ fontFamily: "'Instrument Serif', Georgia, serif" }}>
-              V
+            <span className="flex h-8 w-8 items-center justify-center rounded-lg font-display italic text-base shadow-sm">
+              <img src="/favicon.png"></img>
             </span>
-            <span className="italic font-semibold text-xl leading-none">Void</span>
+            <span className="italic">Techshodh</span>
           </Link>
-          <span className="hidden text-neutral-300 dark:text-neutral-700 sm:inline">|</span>
-          <span className="hidden text-xs text-neutral-400 dark:text-neutral-500 sm:inline">
-            Your Research Agent
+          <span className="hidden h-4 w-px bg-neutral-300 dark:bg-white/15 sm:block" />
+          <span className="hidden font-deva text-sm text-neutral-500 sm:inline">
+            ✦ शोध · Research Agent ✦
           </span>
         </div>
         <div className="flex items-center gap-2">
           <button
             onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
-            className="rounded-lg p-1.5 text-neutral-500 dark:text-neutral-400 hover:bg-neutral-100 dark:hover:bg-white/10 hover:text-neutral-800 dark:hover:text-neutral-200 transition-colors"
+            className="rounded-full p-2 text-neutral-500 hover:bg-white/60 dark:hover:bg-white/10 hover:text-neutral-800 dark:hover:text-neutral-200 transition-colors"
             aria-label="Toggle theme"
           >
             {theme === 'dark' ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
           </button>
           <Link
             to="/"
-            className="flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs text-neutral-500 dark:text-neutral-400 transition hover:bg-neutral-100 dark:hover:bg-white/10 hover:text-neutral-800 dark:hover:text-neutral-200"
+            className="flex items-center gap-1.5 rounded-full border border-neutral-200/80 dark:border-white/10 bg-white/70 dark:bg-white/5 px-3 py-1.5 text-[11px] font-semibold uppercase tracking-wider text-neutral-500 transition hover:text-neutral-900 dark:hover:text-neutral-200 hover:shadow-sm"
           >
             <Home className="h-3.5 w-3.5" />
             Home
@@ -448,7 +450,8 @@ export default function WorkspacePage() {
       </header>
 
       {currentUser && (
-        <PanelGroup direction="horizontal" className="flex-1 min-h-0">
+        <PanelGroup direction="horizontal" className="relative flex-1 min-h-0">
+          <div className="workspace-ambient" aria-hidden="true" />
           <Panel defaultSize={18} minSize={14} maxSize={28}>
             <ChatHistoryPanel
               sessions={sessions}
@@ -461,7 +464,7 @@ export default function WorkspacePage() {
             />
           </Panel>
 
-          <PanelResizeHandle className="w-1 bg-neutral-200 dark:bg-white/10 hover:bg-indigo-500/50 dark:hover:bg-indigo-500/50 transition-colors" />
+          <PanelResizeHandle className="relative z-10 w-px bg-neutral-200/60 dark:bg-white/10 hover:bg-neutral-400/50 dark:hover:bg-white/20 transition-colors" />
 
           <Panel defaultSize={52} minSize={35}>
             <ChatPanel
@@ -474,7 +477,7 @@ export default function WorkspacePage() {
             />
           </Panel>
 
-          <PanelResizeHandle className="w-1 bg-neutral-200 dark:bg-white/10 hover:bg-indigo-500/50 dark:hover:bg-indigo-500/50 transition-colors" />
+          <PanelResizeHandle className="relative z-10 w-px bg-neutral-200/60 dark:bg-white/10 hover:bg-neutral-400/50 dark:hover:bg-white/20 transition-colors" />
 
           <Panel defaultSize={30} minSize={20} maxSize={45}>
             <PapersPanel
@@ -496,189 +499,208 @@ export default function WorkspacePage() {
       )}
 
       {userModalMode && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-md p-4">
-          <div className={`relative w-full overflow-hidden rounded-3xl border border-neutral-800 bg-[#070709] text-neutral-200 shadow-[0_0_50px_rgba(99,102,241,0.2)] transition-all duration-300 ${
-            userModalMode === 'login' ? 'max-w-3xl md:max-w-4xl grid grid-cols-1 md:grid-cols-12' : 'max-w-md p-8'
-          }`}>
-            
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-md p-4">
+          <div className={`relative w-full overflow-hidden rounded-2xl border border-neutral-200/60 dark:border-white/10 bg-background text-ink shadow-2xl shadow-neutral-900/10 transition-all duration-300 ${userModalMode === 'login' ? 'max-w-3xl md:max-w-4xl grid grid-cols-1 md:grid-cols-12' : 'max-w-md p-8 bg-white dark:bg-void-900'
+            }`}>
+
             {userModalMode === 'login' && (
-              <div className="col-span-6 relative hidden md:block overflow-hidden h-full min-h-[500px] bg-black">
-                <img
-                  src="/void_login_bg.png"
-                  alt="Void Cosmic Background"
-                  className="absolute inset-0 h-full w-full object-cover opacity-90 transition-opacity"
-                />
-                <div className="absolute inset-0 bg-gradient-to-r from-transparent via-[#070709]/30 to-[#070709] w-full h-full" />
-                <div className="absolute inset-0 bg-gradient-to-t from-[#070709] via-transparent to-transparent w-full h-full" />
-                <div className="absolute bottom-8 left-8 right-8 text-left z-10">
-                  <span className="flex h-10 w-10 items-center justify-center rounded-2xl bg-white text-black text-xl font-bold shadow-md border border-neutral-200 font-display mb-3"
-                  style={{ fontFamily: "'Instrument Serif', Georgia, serif" }}>
-                    V
+              <div className="col-span-6 relative hidden md:flex flex-col min-h-[550px] bg-[#faf6f0] overflow-hidden">
+
+                {/* Background Glow */}
+                <div className="absolute inset-0 ambient-glow-bg-strong z-0 pointer-events-none" />
+
+                {/* IMAGE ZONE (fixed layout, no overlap) */}
+                <div className="relative z-[2] h-[320px] flex items-center justify-center pt-6">
+                  <div className="relative">
+                    {/* soft light behind image */}
+                    <div className="absolute inset-0 bg-white/30 blur-3xl rounded-full scale-110" />
+
+                    <img
+                      src="/Namaste.png"
+                      alt="Namaste — welcome to Techshodh"
+                      className="relative h-[280px] w-auto object-contain drop-shadow-lg"
+                    />
+                  </div>
+                </div>
+
+                {/* Decorative Arc */}
+                <div className="pointer-events-none absolute bottom-0 inset-x-0 h-[32%] rajshahi-arc border-t border-neutral-300/20 z-[1]" />
+
+                {/* TEXT ZONE */}
+                <div className="relative z-10 px-10 pb-1 pt-10  0 flex flex-col gap-4">
+
+                  <span className="font-deva text-sm text-neutral-800 flex items-center gap-2">
+                    <span>✦</span>
+                    <span>{WORKSPACE_QUOTES[0].deva}</span>
+                    <span>✦</span>
                   </span>
-                  <h4 className="text-2xl font-display font-semibold tracking-tight text-white leading-tight">
-                    Explore the infinite void of research.
+
+                  <h4 className="font-display text-3xl font-normal tracking-tight text-neutral-900 leading-tight">
+                    Begin your <em className="italic text-neutral-900">शोध.</em>
                   </h4>
-                  <p className="text-xs text-neutral-450 mt-2 font-sans max-w-xs leading-relaxed">
-                    A persistent research workspace powered by LangGraph, grounded in scientific papers, and organized in beautiful interactive cards.
+
+                  <p className="text-sm text-neutral-800 mt-1 max-w-xs leading-relaxed font-sans">
+                    {WORKSPACE_QUOTES[0].gloss} — Bharat&apos;s research agent, grounded in papers you trust.
                   </p>
                 </div>
+
               </div>
             )}
 
-            <div className={userModalMode === 'login' ? 'col-span-6 p-8 md:p-12 flex flex-col justify-center bg-[#070709]' : 'bg-[#070709]'}>
-                {userModalMode === 'manage' && (
+            <div className={userModalMode === 'login' ? 'col-span-6 p-8 md:p-10 flex flex-col justify-center bg-white dark:bg-void-900' : ''}>
+              {userModalMode === 'manage' && (
+                <button
+                  type="button"
+                  onClick={() => setUserModalMode(null)}
+                  className="absolute right-4 top-4 rounded-full p-1.5 text-neutral-400 hover:bg-neutral-100 dark:hover:bg-white/5 hover:text-neutral-800 dark:hover:text-white"
+                >
+                  <X className="h-4 w-4" />
+                </button>
+              )}
+
+              <div className="text-center mb-6">
+                {userModalMode !== 'login' && (
+                  <span className="inline-flex h-11 w-11 items-center justify-center rounded-lg bg-foreground text-background font-display italic text-lg shadow-sm mb-3">
+                    <img src="favicon.png"></img>
+                  </span>
+                )}
+                <h3 className="font-display text-2xl font-normal tracking-tight text-ink dark:text-neutral-100">
+                  {userModalMode === 'login' ? 'Welcome to Techshodh' : 'Account'}
+                </h3>
+                <p className="text-xs text-neutral-500 mt-1.5 font-deva">
+                  तेजस्वि नावधीतमस्तु
+                </p>
+                <p className="text-[11px] text-neutral-400 mt-0.5">
+                  Your AI Research Agent · Grounded in papers you trust.
+                </p>
+              </div>
+
+              {userModalMode === 'manage' ? (
+                <div className="space-y-4">
+                  <div className="rounded-xl border border-neutral-200 dark:border-white/10 bg-neutral-50 dark:bg-void-950 p-4 text-center">
+                    <p className="text-sm font-medium text-neutral-700 dark:text-neutral-300">
+                      {currentUser?.email}
+                    </p>
+                  </div>
                   <button
                     type="button"
-                    onClick={() => setUserModalMode(null)}
-                    className="absolute right-4 top-4 rounded-full p-1.5 text-neutral-400 hover:bg-white/5 hover:text-white"
+                    onClick={handleLogout}
+                    className="w-full rounded-xl border border-red-200 dark:border-red-500/20 hover:border-red-300 dark:hover:border-red-500/40 bg-red-50 dark:bg-red-500/5 hover:bg-red-100 dark:hover:bg-red-500/10 py-3 text-sm font-semibold text-red-600 dark:text-red-400 transition"
                   >
-                    <X className="h-4 w-4" />
+                    Sign out
                   </button>
-                )}
-
-                <div className="text-center mb-6">
-                  {userModalMode !== 'login' && (
-                    <span className="inline-flex h-12 w-12 items-center justify-center rounded-2xl bg-white text-black text-2xl font-bold shadow-md border border-neutral-200 font-display mb-3"
-                    style={{ fontFamily: "'Instrument Serif', Georgia, serif" }}>
-                      V
-                    </span>
-                  )}
-                  <h3 className="text-2xl font-display font-semibold tracking-tight text-white">
-                    {userModalMode === 'login' ? 'Welcome to Void' : 'Account'}
-                  </h3>
-                  <p className="text-xs text-neutral-450 mt-1">
-                    Your AI Research Agent · Grounded in papers you trust.
-                  </p>
                 </div>
-
-                {userModalMode === 'manage' ? (
-                  <div className="space-y-4">
-                    <div className="rounded-xl border border-neutral-800 bg-[#0e0e12] p-4 text-center">
-                      <p className="text-sm font-medium text-neutral-300">
-                        {currentUser?.email}
-                      </p>
-                    </div>
+              ) : (
+                <>
+                  <div className="flex border-b border-neutral-200 dark:border-white/10 mb-6">
                     <button
                       type="button"
-                      onClick={handleLogout}
-                      className="w-full rounded-xl border border-red-500/20 hover:border-red-500/40 bg-red-500/5 hover:bg-red-500/10 py-3 text-sm font-semibold text-red-400 transition"
+                      onClick={() => { setModalTab('signin'); setModalError(''); }}
+                      className={`flex-1 pb-3 text-sm font-medium transition ${modalTab === 'signin'
+                        ? 'border-b-2 border-foreground text-ink dark:text-neutral-100'
+                        : 'text-neutral-400 hover:text-neutral-600 dark:hover:text-neutral-300'
+                        }`}
                     >
-                      Sign out
+                      Sign In
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => { setModalTab('create'); setModalError(''); }}
+                      className={`flex-1 pb-3 text-sm font-medium transition ${modalTab === 'create'
+                        ? 'border-b-2 border-foreground text-ink dark:text-neutral-100'
+                        : 'text-neutral-400 hover:text-neutral-600 dark:hover:text-neutral-300'
+                        }`}
+                    >
+                      Create Account
                     </button>
                   </div>
-                ) : (
-                  <>
-                    <div className="flex border-b border-neutral-800 mb-6">
-                      <button
-                        type="button"
-                        onClick={() => { setModalTab('signin'); setModalError(''); }}
-                        className={`flex-1 pb-3 text-sm font-medium transition ${
-                          modalTab === 'signin'
-                            ? 'border-b-2 border-indigo-500 text-indigo-400'
-                            : 'text-neutral-500 hover:text-neutral-300'
-                        }`}
-                      >
-                        Sign In
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => { setModalTab('create'); setModalError(''); }}
-                        className={`flex-1 pb-3 text-sm font-medium transition ${
-                          modalTab === 'create'
-                            ? 'border-b-2 border-indigo-500 text-indigo-400'
-                            : 'text-neutral-500 hover:text-neutral-300'
-                        }`}
-                      >
-                        Create Account
-                      </button>
+
+                  {modalError && (
+                    <div className="mb-4 rounded-xl border border-red-200 dark:border-red-500/20 bg-red-50 dark:bg-red-500/10 px-3.5 py-2.5 text-xs text-red-600 dark:text-red-400 leading-relaxed">
+                      {modalError}
                     </div>
+                  )}
 
-                    {modalError && (
-                      <div className="mb-4 rounded-xl border border-red-500/20 bg-red-500/10 px-3.5 py-2.5 text-xs text-red-400 leading-relaxed">
-                        {modalError}
+                  {modalTab === 'signin' ? (
+                    <form onSubmit={handleLogin} className="space-y-4">
+                      <div>
+                        <label className="block text-[10px] font-semibold text-neutral-500 uppercase tracking-wider mb-1.5">
+                          Email
+                        </label>
+                        <input
+                          type="email"
+                          required
+                          autoComplete="email"
+                          placeholder="you@example.com"
+                          value={loginEmail}
+                          onChange={(e) => setLoginEmail(e.target.value)}
+                          className="w-full rounded-xl border border-neutral-200 dark:border-white/10 bg-neutral-50 dark:bg-void-950 px-4 py-3 text-sm text-ink dark:text-white placeholder:text-neutral-400 outline-none focus:border-neutral-400 dark:focus:border-white/25 focus:ring-2 focus:ring-neutral-200/50 dark:focus:ring-white/5 transition duration-200"
+                        />
                       </div>
-                    )}
-
-                    {modalTab === 'signin' ? (
-                      <form onSubmit={handleLogin} className="space-y-4">
-                        <div>
-                          <label className="block text-[10px] font-semibold text-neutral-500 uppercase tracking-wider mb-1.5">
-                            Email
-                          </label>
-                          <input
-                            type="email"
-                            required
-                            autoComplete="email"
-                            placeholder="you@example.com"
-                            value={loginEmail}
-                            onChange={(e) => setLoginEmail(e.target.value)}
-                            className="w-full rounded-xl border border-neutral-800 bg-[#0e0e12] px-4 py-3 text-sm text-white placeholder:text-neutral-600 outline-none focus:border-indigo-500/80 focus:ring-2 focus:ring-indigo-500/10 transition duration-200"
-                          />
-                        </div>
-                        <div>
-                          <label className="block text-[10px] font-semibold text-neutral-500 uppercase tracking-wider mb-1.5">
-                            Password
-                          </label>
-                          <input
-                            type="password"
-                            required
-                            autoComplete="current-password"
-                            placeholder="Your password"
-                            value={loginPassword}
-                            onChange={(e) => setLoginPassword(e.target.value)}
-                            className="w-full rounded-xl border border-neutral-800 bg-[#0e0e12] px-4 py-3 text-sm text-white placeholder:text-neutral-600 outline-none focus:border-indigo-500/80 focus:ring-2 focus:ring-indigo-500/10 transition duration-200"
-                          />
-                        </div>
-                        <button
-                          type="submit"
-                          disabled={loading}
-                          className="w-full rounded-xl void-gradient-bg py-3 text-sm font-semibold text-white shadow-lg shadow-indigo-500/20 hover:scale-[1.01] hover:brightness-110 transition disabled:opacity-60"
-                        >
-                          {loading ? 'Signing in...' : 'Sign In'}
-                        </button>
-                      </form>
-                    ) : (
-                      <form onSubmit={handleRegister} className="space-y-4">
-                        <div>
-                          <label className="block text-[10px] font-semibold text-neutral-500 uppercase tracking-wider mb-1.5">
-                            Email
-                          </label>
-                          <input
-                            type="email"
-                            required
-                            autoComplete="email"
-                            placeholder="you@example.com"
-                            value={registerEmail}
-                            onChange={(e) => setRegisterEmail(e.target.value)}
-                            className="w-full rounded-xl border border-neutral-800 bg-[#0e0e12] px-4 py-3 text-sm text-white placeholder:text-neutral-600 outline-none focus:border-indigo-500/80 focus:ring-2 focus:ring-indigo-500/10 transition duration-200"
-                          />
-                        </div>
-                        <div>
-                          <label className="block text-[10px] font-semibold text-neutral-500 uppercase tracking-wider mb-1.5">
-                            Password
-                          </label>
-                          <input
-                            type="password"
-                            required
-                            autoComplete="new-password"
-                            placeholder="At least 8 characters"
-                            value={registerPassword}
-                            onChange={(e) => setRegisterPassword(e.target.value)}
-                            className="w-full rounded-xl border border-neutral-800 bg-[#0e0e12] px-4 py-3 text-sm text-white placeholder:text-neutral-600 outline-none focus:border-indigo-500/80 focus:ring-2 focus:ring-indigo-500/10 transition duration-200"
-                          />
-                        </div>
-                        <button
-                          type="submit"
-                          disabled={loading}
-                          className="w-full rounded-xl void-gradient-bg py-3 text-sm font-semibold text-white shadow-lg shadow-indigo-500/20 hover:scale-[1.01] hover:brightness-110 transition disabled:opacity-60"
-                        >
-                          {loading ? 'Creating account...' : 'Create Account'}
-                        </button>
-                      </form>
-                    )}
-                  </>
-                )}
-              </div>
+                      <div>
+                        <label className="block text-[10px] font-semibold text-neutral-500 uppercase tracking-wider mb-1.5">
+                          Password
+                        </label>
+                        <input
+                          type="password"
+                          required
+                          autoComplete="current-password"
+                          placeholder="Your password"
+                          value={loginPassword}
+                          onChange={(e) => setLoginPassword(e.target.value)}
+                          className="w-full rounded-xl border border-neutral-200 dark:border-white/10 bg-neutral-50 dark:bg-void-950 px-4 py-3 text-sm text-ink dark:text-white placeholder:text-neutral-400 outline-none focus:border-neutral-400 dark:focus:border-white/25 focus:ring-2 focus:ring-neutral-200/50 dark:focus:ring-white/5 transition duration-200"
+                        />
+                      </div>
+                      <button
+                        type="submit"
+                        disabled={loading}
+                        className="w-full rounded-full workspace-btn-primary py-3 text-sm font-semibold shadow-sm hover:scale-[1.01] transition disabled:opacity-60"
+                      >
+                        {loading ? 'Signing in...' : 'Sign In'}
+                      </button>
+                    </form>
+                  ) : (
+                    <form onSubmit={handleRegister} className="space-y-4">
+                      <div>
+                        <label className="block text-[10px] font-semibold text-neutral-500 uppercase tracking-wider mb-1.5">
+                          Email
+                        </label>
+                        <input
+                          type="email"
+                          required
+                          autoComplete="email"
+                          placeholder="you@example.com"
+                          value={registerEmail}
+                          onChange={(e) => setRegisterEmail(e.target.value)}
+                          className="w-full rounded-xl border border-neutral-200 dark:border-white/10 bg-neutral-50 dark:bg-void-950 px-4 py-3 text-sm text-ink dark:text-white placeholder:text-neutral-400 outline-none focus:border-neutral-400 dark:focus:border-white/25 focus:ring-2 focus:ring-neutral-200/50 dark:focus:ring-white/5 transition duration-200"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-[10px] font-semibold text-neutral-500 uppercase tracking-wider mb-1.5">
+                          Password
+                        </label>
+                        <input
+                          type="password"
+                          required
+                          autoComplete="new-password"
+                          placeholder="At least 8 characters"
+                          value={registerPassword}
+                          onChange={(e) => setRegisterPassword(e.target.value)}
+                          className="w-full rounded-xl border border-neutral-200 dark:border-white/10 bg-neutral-50 dark:bg-void-950 px-4 py-3 text-sm text-ink dark:text-white placeholder:text-neutral-400 outline-none focus:border-neutral-400 dark:focus:border-white/25 focus:ring-2 focus:ring-neutral-200/50 dark:focus:ring-white/5 transition duration-200"
+                        />
+                      </div>
+                      <button
+                        type="submit"
+                        disabled={loading}
+                        className="w-full rounded-full workspace-btn-primary py-3 text-sm font-semibold shadow-sm hover:scale-[1.01] transition disabled:opacity-60"
+                      >
+                        {loading ? 'Creating account...' : 'Create Account'}
+                      </button>
+                    </form>
+                  )}
+                </>
+              )}
+            </div>
 
           </div>
         </div>

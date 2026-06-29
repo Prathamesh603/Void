@@ -4,12 +4,12 @@ import ReactMarkdown from 'react-markdown';
 import { ArrowUp, Loader2, Sparkles } from 'lucide-react';
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
 import { vscDarkPlus } from 'react-syntax-highlighter/dist/esm/styles/prism';
-
+import { pickWorkspaceQuote } from '../../lib/constants';
 
 const suggestions = [
-  'Find recent papers on transformer architectures',
+  'Find recent papers on Indic LLM evaluation',
   'Summarize trends in physics-informed neural networks',
-  'What are the latest advances in RAG for research?',
+  'Compare transformer efficiency methods from arXiv',
 ];
 
 export default function ChatPanel({
@@ -22,6 +22,7 @@ export default function ChatPanel({
 }) {
   const [input, setInput] = useState('');
   const bottomRef = useRef(null);
+  const quote = pickWorkspaceQuote(isNewSession ? 0 : 2);
 
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -35,47 +36,39 @@ export default function ChatPanel({
   };
 
   return (
-    <div className="relative flex h-full flex-col bg-white dark:bg-void-950 transition-colors duration-300 overflow-hidden">
-
-      {/* Panel-wide ambient glow — pointer-events-none, doesn't affect layout */}
-      <div className="pointer-events-none absolute -inset-4 rounded-2xl bg-gradient-to-r from-indigo-500/20 via-purple-500/20 to-cyan-400/20 blur-3xl opacity-40" />
-      <div className="pointer-events-none absolute -inset-2 rounded-2xl bg-indigo-500/10 blur-2xl opacity-50" />
+    <div className="relative z-10 flex h-full flex-col bg-[#fcfbf9] dark:bg-void-950 transition-colors duration-300 overflow-hidden">
 
       {/* Header */}
-      <div className="relative z-10 border-b border-neutral-200 dark:border-white/10 px-5 py-3 bg-white/80 dark:bg-void-950/80 backdrop-blur-sm transition-colors">
-        <h2 className="mt-2 text-sm font-semibold tracking-tight text-neutral-800 dark:text-neutral-300 font-display">
-          Chat
-        </h2>
-        {sessionName && (
-          <p className="truncate text-xs text-neutral-400 dark:text-neutral-500 mt-0.5 font-display tracking-wide">{sessionName}</p>
-        )}
+      <div className="relative z-10 border-b border-neutral-200/50 dark:border-white/10 px-5 py-3.5 bg-white/60 dark:bg-void-950/80 backdrop-blur-sm">
+        <div className="flex items-baseline justify-between gap-3">
+          <div>
+            <h2 className="font-display text-base font-normal tracking-tight text-ink dark:text-neutral-200">
+              {isNewSession ? 'New शोध session' : 'Research chat'}
+            </h2>
+            {sessionName && (
+              <p className="truncate text-xs text-neutral-500 dark:text-neutral-400 mt-0.5 font-sans">{sessionName}</p>
+            )}
+          </div>
+          <p className="hidden sm:block font-deva text-xs text-neutral-400 shrink-0">
+            ✦ {quote.deva}
+          </p>
+        </div>
       </div>
 
-      {/* Messages — flex-1 scrollable, no layout shift */}
+      {/* Messages */}
       <div className="relative z-10 flex-1 overflow-y-auto px-4 py-6 md:px-8">
         {switchingSession ? (
           <div className="mx-auto max-w-3xl space-y-4">
-            {/* Assistant Skeleton */}
             <div className="flex justify-start">
-              <div className="w-[60%] rounded-2xl px-4 py-3 bg-white/60 dark:bg-white/[0.04] border border-neutral-200/70 dark:border-white/[0.07] animate-pulse space-y-2">
-                <div className="h-3 bg-neutral-300 dark:bg-neutral-700 rounded w-3/4"></div>
-                <div className="h-3 bg-neutral-300 dark:bg-neutral-700 rounded w-5/6"></div>
-                <div className="h-3 bg-neutral-300 dark:bg-neutral-700 rounded w-1/2"></div>
+              <div className="w-[60%] rounded-2xl px-4 py-3 bg-white/80 dark:bg-white/[0.04] border border-neutral-200/60 dark:border-white/[0.07] animate-pulse space-y-2">
+                <div className="h-3 bg-neutral-200 dark:bg-neutral-700 rounded w-3/4" />
+                <div className="h-3 bg-neutral-200 dark:bg-neutral-700 rounded w-5/6" />
+                <div className="h-3 bg-neutral-200 dark:bg-neutral-700 rounded w-1/2" />
               </div>
             </div>
-
-            {/* User Skeleton */}
             <div className="flex justify-end">
-              <div className="w-[40%] rounded-2xl px-4 py-3 bg-indigo-600/30 dark:bg-indigo-900/30 border border-indigo-500/20 animate-pulse">
-                <div className="h-3 bg-indigo-200/30 dark:bg-indigo-400/25 rounded w-2/3 ml-auto"></div>
-              </div>
-            </div>
-
-            {/* Assistant Skeleton */}
-            <div className="flex justify-start">
-              <div className="w-[70%] rounded-2xl px-4 py-3 bg-white/60 dark:bg-white/[0.04] border border-neutral-200/70 dark:border-white/[0.07] animate-pulse space-y-2">
-                <div className="h-3 bg-neutral-300 dark:bg-neutral-700 rounded w-5/6"></div>
-                <div className="h-3 bg-neutral-300 dark:bg-neutral-700 rounded w-2/3"></div>
+              <div className="w-[40%] rounded-2xl px-4 py-3 bg-neutral-200/60 dark:bg-white/10 border border-neutral-300/40 animate-pulse">
+                <div className="h-3 bg-neutral-300/50 dark:bg-white/10 rounded w-2/3 ml-auto" />
               </div>
             </div>
           </div>
@@ -83,14 +76,24 @@ export default function ChatPanel({
           <motion.div
             initial={{ opacity: 0, y: 12 }}
             animate={{ opacity: 1, y: 0 }}
-            className="mx-auto max-w-xl text-center pt-12 md:pt-20"
+            className="mx-auto max-w-xl text-center pt-10 md:pt-16"
           >
-            <span className="text-4xl">👋</span>
-            <h3 className="mt-4 text-xl font-semibold tracking-tight text-neutral-900 dark:text-neutral-105 font-display">
-              {isNewSession ? "Let's start your research" : 'Continue your research'}
+            <p className="font-deva text-sm text-neutral-500 flex items-center justify-center gap-2">
+              <span>✦</span>
+              <span>{quote.deva}</span>
+              <span>✦</span>
+            </p>
+            <p className="mt-1 text-[11px] text-neutral-400 italic">{quote.gloss}</p>
+
+            <h3 className="mt-8 font-display text-2xl md:text-3xl font-normal tracking-tight text-ink dark:text-neutral-100">
+              {isNewSession ? (
+                <>Begin your <em className="italic">शोध.</em></>
+              ) : (
+                'Continue your research'
+              )}
             </h3>
-            <p className="mt-2 text-sm text-neutral-500 dark:text-neutral-400 leading-relaxed font-sans">
-              Ask Void to search papers, explain concepts, or dive into sources saved in this session.
+            <p className="mt-3 text-sm text-neutral-500 dark:text-neutral-400 leading-relaxed font-sans max-w-md mx-auto">
+              Ask Techshodh to search arXiv, explain concepts, or dive into papers saved in this session.
             </p>
             <div className="mt-8 flex flex-wrap justify-center gap-2">
               {suggestions.map((s) => (
@@ -99,7 +102,7 @@ export default function ChatPanel({
                   type="button"
                   onClick={() => submit(s)}
                   disabled={loading || switchingSession}
-                  className="rounded-full border border-neutral-200 dark:border-white/10 bg-neutral-50 dark:bg-white/5 px-4 py-2 text-xs text-neutral-600 dark:text-neutral-400 hover:bg-neutral-100 hover:border-indigo-500/40 hover:text-neutral-900 dark:hover:text-neutral-200 transition font-sans disabled:opacity-50"
+                  className="rounded-full border border-neutral-200/80 dark:border-white/10 bg-white dark:bg-white/5 px-4 py-2 text-xs text-neutral-600 dark:text-neutral-400 hover:bg-neutral-50 hover:border-neutral-300 hover:text-neutral-900 dark:hover:text-neutral-200 transition font-sans disabled:opacity-50 shadow-sm"
                 >
                   {s}
                 </button>
@@ -116,18 +119,23 @@ export default function ChatPanel({
                   animate={{ opacity: 1, y: 0 }}
                   className={`flex ${m.role === 'user' ? 'justify-end' : 'justify-start'}`}
                 >
+                  {m.role === 'assistant' && (
+                    <div className="mr-2 mt-1 flex h-6 w-6 shrink-0 items-center justify-center rounded  font-display italic text-xs">
+                      <img src="/favicon.png"></img>
+                    </div>
+                  )}
                   <div
                     className={
                       m.role === 'user'
-                        ? 'max-w-[82%] rounded-2xl px-4 py-3 text-[15px] leading-[1.65] bg-indigo-600/90 backdrop-blur-md text-white shadow-lg shadow-indigo-500/20 border border-indigo-500/30'
-                        : 'max-w-[92%] py-2 text-[15px] leading-[1.65] text-neutral-800 dark:text-neutral-200'
+                        ? 'max-w-[82%] rounded-2xl px-4 py-3 text-[15px] leading-[1.65] workspace-user-bubble shadow-sm'
+                        : 'max-w-[88%] py-2 text-[15px] leading-[1.65] text-neutral-800 dark:text-neutral-200'
                     }
                   >
                     {m.role === 'assistant' ? (
                       <div className="markdown-body prose-invert prose-neutral max-w-none">
                         <ReactMarkdown
                           components={{
-                            code({ node, className, children, ...props }) {
+                            code({ className, children, ...props }) {
                               const match = /language-(\w+)/.exec(className || '');
                               return match ? (
                                 <SyntaxHighlighter
@@ -158,7 +166,7 @@ export default function ChatPanel({
                         {m.tools_used.map((t) => (
                           <span
                             key={t.tool_name}
-                            className="rounded-md bg-neutral-200/50 dark:bg-white/10 px-2 py-0.5 text-[10px] tracking-wide text-neutral-500 dark:text-neutral-400"
+                            className="rounded-md bg-neutral-100 dark:bg-white/10 px-2 py-0.5 text-[10px] tracking-wide text-neutral-500 dark:text-neutral-400 uppercase"
                           >
                             {t.tool_name}
                           </span>
@@ -176,9 +184,9 @@ export default function ChatPanel({
                 animate={{ opacity: 1 }}
                 className="flex items-center gap-2 text-sm text-neutral-500 dark:text-neutral-400 pl-1"
               >
-                <Loader2 className="h-4 w-4 animate-spin text-indigo-400" />
-                <Sparkles className="h-4 w-4 text-indigo-400" />
-                Void is researching…
+                <Loader2 className="h-4 w-4 animate-spin text-neutral-400" />
+                <Sparkles className="h-4 w-4 text-amber-600/70 dark:text-amber-400/70" />
+                Techshodh is researching…
               </motion.div>
             )}
             <div ref={bottomRef} />
@@ -186,41 +194,36 @@ export default function ChatPanel({
         )}
       </div>
 
-      {/* Input bar — sticky, no outer glow container causing layout shift */}
-      <div className="relative z-10 px-4 pb-0 pt-3 bg-transparent">
-
-        {/* Subtle fade from below messages into input area */}
-        <div className="pointer-events-none absolute inset-x-0 -top-8 h-8 bg-gradient-to-b from-transparent to-white/80 dark:to-void-950/80" />
-
-        {/* Ambient glow behind the input pill only */}
-        <div className="pointer-events-none absolute inset-x-8 inset-y-0 rounded-3xl bg-gradient-to-r from-indigo-500/20 via-purple-500/15 to-cyan-400/20 blur-2xl opacity-60" />
+      {/* Input bar */}
+      <div className="relative z-10 px-4 pb-3 pt-2 bg-transparent">
+        <div className="pointer-events-none absolute inset-x-0 -top-8 h-8 bg-gradient-to-b from-transparent to-[#fcfbf9]/90 dark:to-void-950/90" />
 
         <form
           onSubmit={(e) => {
             e.preventDefault();
             submit();
           }}
-          className="relative mx-auto flex max-w-3xl gap-2 rounded-3xl border border-neutral-200/80 dark:border-white/[0.07] bg-white/70 dark:bg-white/[0.04] backdrop-blur-xl p-2 shadow-lg shadow-indigo-500/10 focus-within:border-indigo-400/50 dark:focus-within:border-indigo-500/30 focus-within:ring-1 focus-within:ring-indigo-500/20 transition-all duration-200"
+          className="relative mx-auto flex max-w-3xl gap-2 rounded-2xl border border-neutral-200/80 dark:border-white/[0.07] bg-white/90 dark:bg-white/[0.04] backdrop-blur-xl p-2 shadow-sm focus-within:border-neutral-300 dark:focus-within:border-white/15 focus-within:ring-1 focus-within:ring-neutral-200/60 dark:focus-within:ring-white/5 transition-all duration-200"
         >
           <input
             value={input}
             onChange={(e) => setInput(e.target.value)}
             placeholder="Ask a research question…"
             disabled={loading || switchingSession}
-            className="flex-1 bg-transparent px-3 py-2 text-[15px] text-neutral-900 dark:text-neutral-100 placeholder:text-neutral-400 dark:placeholder:text-neutral-500 outline-none"
+            className="flex-1 bg-transparent px-3 py-2 text-[15px] text-ink dark:text-neutral-100 placeholder:text-neutral-400 dark:placeholder:text-neutral-500 outline-none font-sans"
           />
 
           <button
             type="submit"
             disabled={loading || switchingSession || !input.trim()}
-            className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl void-gradient-bg text-white transition-all disabled:opacity-40 hover:scale-105 active:scale-95 shadow-md shadow-indigo-500/20"
+            className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl workspace-btn-primary transition-all disabled:opacity-40 hover:scale-105 active:scale-95 shadow-sm"
           >
             <ArrowUp className="h-4 w-4" />
           </button>
         </form>
-        <div className="mt-2 text-xs text-neutral-400 dark:text-neutral-500 text-center mb--4">
-          Void can make mistakes. Double check important info.
-        </div>
+        <p className="mt-2 text-[10px] text-neutral-400 dark:text-neutral-500 text-center font-deva">
+          सा विद्या या विमुक्तये · Techshodh can make mistakes — verify important claims
+        </p>
       </div>
     </div>
   );
